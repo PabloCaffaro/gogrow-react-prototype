@@ -87,13 +87,4 @@ export const dishes: Dish[] = [
     description: 'Carne al horno con papas rústicas y vegetales de estación.',
     price: 190,
   },
-  {
-    id: 8,
-    dayId: 'vie-14',
-    providerId: 'endulzate',
-    providerName: 'Endulzate by Noe',
-    name: 'Ñoquis con salsa rosa',
-    description: 'Ñoquis de papa caseros acompañados con salsa rosa.',
-    price: 165,
-  },
 ]

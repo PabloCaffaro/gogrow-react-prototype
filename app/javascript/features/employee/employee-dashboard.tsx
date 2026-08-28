@@ -231,13 +231,21 @@ export function EmployeeDashboard({ email }: Props) {
                   </button>
                 </article>
               )
-            }) : (
-              <div className={styles.emptyState}>
-                <UtensilsCrossed aria-hidden="true" />
-                <h3>No hay platos para este filtro</h3>
-                <p>Probá seleccionando otro proveedor o día.</p>
-              </div>
-            )}
+              }) : (
+                <div className={styles.emptyState}>
+                  <UtensilsCrossed aria-hidden="true" />
+                  <h3>
+                    {providerFilter === 'all'
+                      ? 'Todavía no hay viandas publicadas'
+                      : 'No hay viandas de este proveedor'}
+                  </h3>
+                  <p>
+                    {providerFilter === 'all'
+                      ? 'Elegí otro día para consultar el menú disponible.'
+                      : 'Probá seleccionando otro proveedor o día.'}
+                  </p>
+                </div>
+              )}
           </div>
         </section>
 
