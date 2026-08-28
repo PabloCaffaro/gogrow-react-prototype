@@ -1,0 +1,47 @@
+/* Estilo común para todos los tipos de input compatibles con HTML. */
+.input {
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.input:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  background: color-mix(in oklch, var(--input) 50%, transparent);
+  opacity: 0.5;
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+/* Los controles de archivo necesitan neutralizar el botón nativo del navegador. */
+.input::file-selector-button {
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 500;
+}

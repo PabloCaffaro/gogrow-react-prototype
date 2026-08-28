@@ -1,0 +1,157 @@
+/* Estilos compartidos por todas las variantes del botón. */
+.button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  outline: none;
+  user-select: none;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    color 160ms ease, box-shadow 160ms ease, transform 80ms ease;
+}
+
+/* Los íconos heredan el color y no capturan eventos del puntero. */
+.button svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.button:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+.button:active:not([aria-haspopup="true"]) {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.button[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+/* Variantes visuales: expresan la intención de la acción, no su ubicación. */
+.default {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.default:hover {
+  background: color-mix(in oklch, var(--primary) 80%, transparent);
+}
+
+.outline {
+  border-color: var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.outline:hover {
+  background: var(--muted);
+}
+
+.secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.secondary:hover {
+  background: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--foreground);
+}
+
+.ghost:hover {
+  background: var(--muted);
+}
+
+.destructive {
+  background: color-mix(in oklch, var(--destructive) 10%, transparent);
+  color: var(--destructive);
+}
+
+.destructive:hover {
+  background: color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+.link {
+  height: auto;
+  padding: 0;
+  background: transparent;
+  color: var(--primary);
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Los tamaños mantienen una API consistente para texto e íconos. */
+.sizeDefault {
+  min-height: 2rem;
+  padding-inline: 0.625rem;
+}
+
+.sizeExtraSmall {
+  min-height: 1.5rem;
+  padding-inline: 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+}
+
+.sizeSmall {
+  min-height: 1.75rem;
+  padding-inline: 0.625rem;
+  font-size: 0.8rem;
+}
+
+.sizeLarge {
+  min-height: 2.25rem;
+  padding-inline: 0.75rem;
+}
+
+.sizeIcon,
+.sizeIconExtraSmall,
+.sizeIconSmall,
+.sizeIconLarge {
+  padding: 0;
+}
+
+.sizeIcon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.sizeIconExtraSmall {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.sizeIconSmall {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.sizeIconLarge {
+  width: 2.25rem;
+  height: 2.25rem;
+}

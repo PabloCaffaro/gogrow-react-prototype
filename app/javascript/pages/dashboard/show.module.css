@@ -1,0 +1,171 @@
+.page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.header {
+  border-bottom: 1px solid var(--border);
+  background: white;
+}
+
+.headerContent,
+.content {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1rem;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Ambos íconos reciben el color desde `data-role`, no desde el objeto JavaScript. */
+.brandIcon,
+.roleIcon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.brandIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-xl);
+}
+
+.roleIcon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%);
+}
+
+.brandIcon[data-role="empleado"],
+.roleIcon[data-role="empleado"] {
+  background: #2563eb;
+}
+
+.brandIcon[data-role="administrador"],
+.roleIcon[data-role="administrador"] {
+  background: #7c3aed;
+}
+
+.brandIcon[data-role="proveedor"],
+.roleIcon[data-role="proveedor"] {
+  background: #059669;
+}
+
+.smallIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.brandIcon .smallIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.largeIcon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.portalName,
+.email,
+.title,
+.description {
+  margin: 0;
+}
+
+.portalName {
+  font-weight: 600;
+}
+
+.email {
+  margin-top: 0.125rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.content {
+  padding-block: 2.5rem;
+}
+
+.introduction {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.demoBadge {
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.description {
+  margin-top: 0.5rem;
+  color: var(--muted-foreground);
+}
+
+.metricsGrid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.metricHeader {
+  padding-bottom: 0.5rem;
+}
+
+.metricValue {
+  font-size: 1.875rem;
+}
+
+.actionsCard {
+  margin-top: 1.5rem;
+}
+
+.actionGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.actionButton {
+  min-height: 5rem;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+@media (min-width: 40rem) {
+  .headerContent,
+  .content {
+    padding-inline: 1.5rem;
+  }
+
+  .introduction {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .metricsGrid,
+  .actionGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

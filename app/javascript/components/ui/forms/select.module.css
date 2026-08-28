@@ -1,0 +1,38 @@
+/* `appearance: none` permite un diseño consistente sin perder semántica nativa. */
+.select {
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  padding: 0.25rem 2rem 0.25rem 0.625rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  appearance: none;
+  background-color: transparent;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
+    linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+  background-position: calc(100% - 0.875rem) 50%, calc(100% - 0.625rem) 50%;
+  background-repeat: no-repeat;
+  background-size: 0.25rem 0.25rem, 0.25rem 0.25rem;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.select:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent);
+}
+
+.select:disabled {
+  cursor: not-allowed;
+  background-color: color-mix(in oklch, var(--input) 50%, transparent);
+  opacity: 0.5;
+}
+
+.select[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--destructive) 20%, transparent);
+}

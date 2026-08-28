@@ -1,0 +1,247 @@
+/* La página utiliza el fondo compartido definido como token global. */
+.page {
+  min-height: 100vh;
+  padding: 2.5rem 1rem;
+  background: var(--auth-background);
+}
+
+.layout {
+  display: grid;
+  min-height: calc(100vh - 5rem);
+  max-width: 72rem;
+  margin-inline: auto;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+/* El texto promocional se reserva para escritorios con espacio suficiente. */
+.introduction {
+  display: none;
+  max-width: 36rem;
+  color: white;
+}
+
+.demoBadge {
+  margin-bottom: 1.5rem;
+  border-color: rgb(255 255 255 / 20%);
+  background: rgb(255 255 255 / 10%);
+  color: white;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.heroDescription {
+  margin: 1.5rem 0 0;
+  color: #e2e8f0;
+  font-size: 1.125rem;
+  line-height: 2rem;
+}
+
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+  font-size: 0.875rem;
+}
+
+.roleCard {
+  padding: 1rem;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: var(--radius-2xl);
+  background: rgb(255 255 255 / 10%);
+  backdrop-filter: blur(8px);
+}
+
+.roleIcon {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #67e8f9;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 28rem;
+  margin-inline: auto;
+  border-color: rgb(255 255 255 / 30%);
+  background: rgb(255 255 255 / 95%);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
+  backdrop-filter: blur(12px);
+}
+
+.cardHeader {
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+}
+
+.accessIconBox {
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xl);
+  background: #020617;
+  color: white;
+}
+
+.accessIcon,
+.roleIcon {
+  flex-shrink: 0;
+}
+
+.accessIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+}
+
+.cardDescription {
+  margin-top: 0.25rem;
+}
+
+.form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.fieldHeader,
+.rememberRow,
+.demoDivider {
+  display: flex;
+  align-items: center;
+}
+
+.fieldHeader {
+  justify-content: space-between;
+}
+
+.forgotLink {
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+}
+
+.passwordField {
+  position: relative;
+}
+
+.passwordInput {
+  padding-right: 2.75rem;
+}
+
+.passwordToggle {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  display: flex;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.toggleIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rememberRow {
+  gap: 0.5rem;
+}
+
+.rememberLabel {
+  font-weight: 400;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.demoDivider {
+  gap: 0.75rem;
+  margin-block: 1.5rem;
+}
+
+.dividerLine {
+  flex: 1;
+}
+
+.dividerLabel {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.demoButtons {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cardFooter {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding-block: 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.examplesLink {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.examplesLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+@media (min-width: 40rem) {
+  .page {
+    padding-inline: 1.5rem;
+  }
+
+  .demoButtons {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 64rem) {
+  .layout {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+
+  .introduction {
+    display: block;
+  }
+}

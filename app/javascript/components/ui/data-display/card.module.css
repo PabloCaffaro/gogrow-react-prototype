@@ -1,0 +1,86 @@
+/* La variable local permite que todos los subcomponentes compartan el espaciado. */
+.card {
+  --card-spacing: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-spacing);
+  overflow: hidden;
+  padding-block: var(--card-spacing);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  color: var(--card-foreground);
+  font-size: 0.875rem;
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+.card[data-size="sm"] {
+  --card-spacing: 0.75rem;
+}
+
+.card:has([data-slot="card-footer"]) {
+  padding-bottom: 0;
+}
+
+.card > img:first-child {
+  margin-top: calc(var(--card-spacing) * -1);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.card > img:last-child {
+  margin-bottom: calc(var(--card-spacing) * -1);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+/* Header usa grid para admitir una acción sin alterar título y descripción. */
+.header {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.25rem;
+  align-items: start;
+  padding-inline: var(--card-spacing);
+}
+
+.header:has([data-slot="card-action"]) {
+  grid-template-columns: 1fr auto;
+}
+
+.header:has([data-slot="card-description"]) {
+  grid-template-rows: auto auto;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.375;
+}
+
+.card[data-size="sm"] .title {
+  font-size: 0.875rem;
+}
+
+.description {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.action {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  justify-self: end;
+}
+
+.content {
+  padding-inline: var(--card-spacing);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  padding: var(--card-spacing);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  background: color-mix(in oklch, var(--muted) 50%, transparent);
+}
