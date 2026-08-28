@@ -25,6 +25,8 @@ export const dishes: Dish[] = [
     providerName: 'Endulzate by Noe',
     name: 'Wok de verduras + arroz',
     description: 'Salteado al wok con arroz blanco, morrón, cebolla, zanahoria y zucchini.',
+    details: 'Preparado al momento con vegetales frescos y arroz blanco. Podés elegir el nivel de picante.',
+    customizations: ['Sin picante', 'Picante suave', 'Picante medio'],
     price: 150,
   },
   {
@@ -34,6 +36,8 @@ export const dishes: Dish[] = [
     providerName: 'Endulzate by Noe',
     name: 'Sorrentinos',
     description: 'Sorrentinos de jamón y queso o caprese, con salsa a elección.',
+    details: 'Pasta rellena artesanal acompañada con pan casero. Elegí tu relleno preferido.',
+    customizations: ['Jamón y queso', 'Caprese'],
     price: 150,
   },
   {
@@ -43,6 +47,8 @@ export const dishes: Dish[] = [
     providerName: 'Tu Viandita',
     name: 'Milanesa de pollo',
     description: 'Milanesa de pechuga de pollo con puré de papas y ensalada fresca.',
+    details: 'Pechuga de pollo empanada con guarnición a elección.',
+    customizations: ['Puré de papas', 'Ensalada fresca'],
     price: 170,
   },
   {

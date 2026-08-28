@@ -13,5 +13,7 @@ export type Dish = {
   providerName: string
   name: string
   description: string
+  details?: string
+  customizations?: string[]
   price: number
 }

@@ -468,6 +468,10 @@
     padding: 0 42px 56px;
   }
 
+  .workspace[data-menu='false'] {
+    padding-top: 34px;
+  }
+
   .desktopHeader {
     display: flex;
     min-height: 118px;

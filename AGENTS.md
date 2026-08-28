@@ -85,7 +85,12 @@ El flujo más desarrollado es el dashboard del empleado:
 - Filtro por proveedor.
 - Listado de platos.
 - Selección y deselección de un plato.
-- Resumen del plato seleccionado.
+- Detalle y personalización del plato.
+- Elección de cantidad y lugar de entrega.
+- Revisión, confirmación y estado exitoso del pedido.
+- Consulta de próximos pedidos e historial.
+- Estado de cuenta por proveedor y simulación de comprobantes.
+- Perfil, beneficio asignado y preferencia de notificaciones.
 - Navegación inferior en móvil.
 - Navegación lateral en escritorio.
 
@@ -93,7 +98,11 @@ Archivos principales:
 
 - `app/javascript/features/employee/employee-dashboard.tsx`
 - `app/javascript/features/employee/employee-dashboard.module.css`
+- `app/javascript/features/employee/employee-views.tsx`
+- `app/javascript/features/employee/employee-views.module.css`
 - `app/javascript/mocks/employee-home.ts`
+- `app/javascript/mocks/employee-sections.ts`
+- `app/javascript/domain/employee.ts`
 - `app/javascript/domain/menu.ts`
 - `app/javascript/pages/dashboard/show.tsx`
 
