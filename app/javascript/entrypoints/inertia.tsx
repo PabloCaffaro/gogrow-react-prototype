@@ -1,10 +1,17 @@
 import { createInertiaApp } from '@inertiajs/react'
 
+/**
+ * Punto de arranque de las páginas React servidas por Rails mediante Inertia.
+ * La resolución de `pages` es automática: por ejemplo, `auth/login` carga
+ * `app/javascript/pages/auth/login.tsx`.
+ */
 void createInertiaApp({
   pages: "../pages",
 
+  // Ayuda a detectar efectos secundarios inseguros durante el desarrollo.
   strictMode: true,
 
+  // Convenciones compartidas por todos los formularios y visitas Inertia.
   defaults: {
     form: {
       forceIndicesArrayFormatInFormData: false,
@@ -15,16 +22,14 @@ void createInertiaApp({
     },
   },
 }).catch((error) => {
-  // This ensures this entrypoint is only loaded on Inertia pages
-  // by checking for the presence of the root element (#app by default).
-  // Feel free to remove this `catch` if you don't need it.
+  // Sólo se considera fatal si la página realmente contiene el nodo raíz de Inertia.
   if (document.getElementById("app")) {
     throw error
   } else {
     console.error(
       "Missing root element.\n\n" +
-      "If you see this error, it probably means you loaded Inertia.js on non-Inertia pages.\n" +
-      'Consider moving <%= vite_typescript_tag "inertia.tsx" %> to the Inertia-specific layout instead.',
+      "El entrypoint de Inertia se cargó sin encontrar su nodo raíz.\n" +
+      'Revisá que el layout renderice el contenedor de la página Inertia.',
     )
   }
 })

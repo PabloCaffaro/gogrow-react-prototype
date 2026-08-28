@@ -1,5 +1,6 @@
 import type { EmployeeOrder, ProviderPayment } from '@/domain/employee'
 
+/** Entregas futuras utilizadas por la pestaña "Próximos". */
 export const upcomingOrders: EmployeeOrder[] = [
   {
     id: 'PED-1042',
@@ -21,6 +22,7 @@ export const upcomingOrders: EmployeeOrder[] = [
   },
 ]
 
+/** Pedidos cerrados utilizados por la pestaña "Historial". */
 export const orderHistory: EmployeeOrder[] = [
   {
     id: 'PED-1029',
@@ -42,6 +44,10 @@ export const orderHistory: EmployeeOrder[] = [
   },
 ]
 
+/**
+ * Deudas ficticias por proveedor.
+ * La simulación de comprobantes modifica estado React, nunca este arreglo ni PostgreSQL.
+ */
 export const providerPayments: ProviderPayment[] = [
   {
     id: 'PAY-END-MAY',

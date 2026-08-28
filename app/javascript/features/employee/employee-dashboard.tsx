@@ -1,3 +1,8 @@
+/**
+ * Orquestador principal de la experiencia del empleado.
+ * Mantiene navegación y pedido en memoria para demostrar el flujo completo sin
+ * endpoints de menús, pedidos o pagos.
+ */
 import { useMemo, useState } from 'react'
 import {
   Check,
@@ -26,6 +31,7 @@ type Props = {
   email: string
 }
 
+/** `all` representa la vista combinada de los proveedores conocidos. */
 type ProviderFilter = 'all' | ProviderId
 
 const providerFilters: Array<{ id: ProviderFilter; label: string }> = [
@@ -34,6 +40,7 @@ const providerFilters: Array<{ id: ProviderFilter; label: string }> = [
   { id: 'endulzate', label: 'Endulzate' },
 ]
 
+/** Metadatos compartidos por la barra inferior móvil y la lateral de escritorio. */
 const primaryViews: Record<PrimaryEmployeeSection, {
   icon: typeof UtensilsCrossed
   label: string
@@ -44,6 +51,7 @@ const primaryViews: Record<PrimaryEmployeeSection, {
   account: { icon: UserRound, label: 'Cuenta' },
 }
 
+/** Resumen reutilizado en la portada móvil y en la columna lateral de escritorio. */
 function BenefitCard() {
   const { used, weeklyLimit } = employeePrototype.benefit
   const progress = `${Math.round((used / weeklyLimit) * 100)}%`
@@ -71,6 +79,7 @@ function BenefitCard() {
   )
 }
 
+/** Botón de navegación presentacional; el padre decide qué vista activar. */
 function NavigationItem({
   icon: Icon,
   label,
@@ -96,16 +105,26 @@ function NavigationItem({
   )
 }
 
+/**
+ * Conecta menú, personalización, checkout y secciones secundarias.
+ * Todo el estado se reinicia al recargar porque esta etapa valida UX, no persistencia.
+ */
 export function EmployeeDashboard({ email }: Props) {
+  // Navegación interna: estas vistas no crean entradas nuevas en `config/routes.rb`.
   const [view, setView] = useState<EmployeeView>('menu')
+
+  // Estado del menú semanal y del plato actualmente seleccionado.
   const [selectedDay, setSelectedDay] = useState(menuDays[0].id)
   const [providerFilter, setProviderFilter] = useState<ProviderFilter>('all')
   const [selectedDishId, setSelectedDishId] = useState<number | null>(null)
+
+  // Configuración temporal del pedido mientras el usuario avanza por el flujo.
   const [quantity, setQuantity] = useState(1)
   const [customization, setCustomization] = useState('')
   const [notes, setNotes] = useState('')
   const [delivery, setDelivery] = useState<DeliveryLocation>('office')
 
+  // La lista visible siempre se deriva de los mocks; no se duplica en estado React.
   const visibleDishes = useMemo(
     () => dishes.filter((dish) => (
       dish.dayId === selectedDay &&
@@ -114,26 +133,34 @@ export function EmployeeDashboard({ email }: Props) {
     [providerFilter, selectedDay],
   )
 
+  // Resolver el objeto completo evita buscarlo nuevamente en cada subpantalla.
   const selectedDish = dishes.find((dish) => dish.id === selectedDishId)
+
+  // Las subpantallas de pedido siguen marcando "Menú" como sección principal activa.
   const activeSection: PrimaryEmployeeSection = view === 'orders' || view === 'payments' || view === 'account'
     ? view
     : 'menu'
+  // El flujo de checkout usa su propia acción fija y por eso oculta la navegación móvil.
   const showPrimaryNavigation = !['dish-detail', 'checkout', 'order-success'].includes(view)
 
+  /** Cambia de subpantalla y devuelve el documento al inicio. */
   const navigate = (nextView: EmployeeView) => {
     setView(nextView)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  /** Cambiar de día invalida cualquier selección perteneciente al día anterior. */
   const chooseDay = (dayId: string) => {
     setSelectedDay(dayId)
     setSelectedDishId(null)
   }
 
+  /** El mismo control permite seleccionar y deseleccionar un plato. */
   const toggleDish = (dishId: number) => {
     setSelectedDishId((current) => current === dishId ? null : dishId)
   }
 
+  /** Inicializa valores seguros antes de entrar al detalle del plato. */
   const startOrder = () => {
     if (!selectedDish) return
 
@@ -144,6 +171,7 @@ export function EmployeeDashboard({ email }: Props) {
     navigate('dish-detail')
   }
 
+  /** Portada semanal; se extrae para mantener legible el selector de vistas final. */
   const renderMenu = () => (
     <>
       <header className={styles.desktopHeader}>
@@ -321,6 +349,7 @@ export function EmployeeDashboard({ email }: Props) {
       </aside>
 
       <main className={styles.workspace} data-menu={view === 'menu'}>
+        {/* Cada condición representa una pantalla del prototipo controlada por `view`. */}
         {view === 'menu' && renderMenu()}
         {view === 'dish-detail' && selectedDish && (
           <DishDetailView

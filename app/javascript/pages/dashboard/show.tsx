@@ -48,6 +48,7 @@ const roleData = {
 
 /** Dashboard reutilizable que adapta su contenido y color al rol autenticado. */
 export default function Dashboard({ role, role_info: roleInfo, email }: Props) {
+  // El empleado utiliza el prototipo desarrollado; los otros roles conservan el panel base.
   if (role === 'empleado') {
     return <EmployeeDashboard email={email} />
   }

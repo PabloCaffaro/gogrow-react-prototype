@@ -1,5 +1,6 @@
 import type { Dish, MenuDay } from '@/domain/menu'
 
+/** Identidad y consumo semanal ficticios usados en la portada del empleado. */
 export const employeePrototype = {
   name: 'Sofía',
   dateLabel: 'Lunes, 26 de mayo',
@@ -9,6 +10,7 @@ export const employeePrototype = {
   },
 }
 
+/** Semana estática que permite probar la selección sin consultar una API. */
 export const menuDays: MenuDay[] = [
   { id: 'lun-10', shortName: 'Lun', date: 10 },
   { id: 'mar-11', shortName: 'Mar', date: 11 },
@@ -17,6 +19,11 @@ export const menuDays: MenuDay[] = [
   { id: 'vie-14', shortName: 'Vie', date: 14 },
 ]
 
+/**
+ * Catálogo ficticio del prototipo.
+ * Los platos se relacionan con `menuDays` mediante `dayId`; el viernes se deja
+ * intencionalmente sin registros para demostrar el estado vacío de la interfaz.
+ */
 export const dishes: Dish[] = [
   {
     id: 1,

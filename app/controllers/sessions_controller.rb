@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 class SessionsController < InertiaController
+  # Evita que una sesión válida vuelva a mostrar el formulario de acceso.
   def new
     return redirect_to dashboard_path(current_user.role) if current_user
 
     render inertia: "auth/login"
   end
 
+  # Normaliza las credenciales, autentica con `has_secure_password` y dirige al rol correcto.
   def create
     credentials = params.permit(:email, :password, :remember)
     user = User.find_by(email: credentials[:email].to_s.strip.downcase)
@@ -23,6 +25,7 @@ class SessionsController < InertiaController
     end
   end
 
+  # Elimina tanto la sesión temporal como la cookie opcional de larga duración.
   def destroy
     reset_session
     cookies.delete(:remembered_user_id)

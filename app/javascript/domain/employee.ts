@@ -1,3 +1,10 @@
+/**
+ * Contratos del flujo de empleado.
+ * Este archivo no contiene datos ni comportamiento: define los estados que las
+ * pantallas React y los mocks pueden compartir sin depender entre sí.
+ */
+
+/** Pantallas internas controladas por React; no representan rutas Rails. */
 export type EmployeeView =
   | 'menu'
   | 'dish-detail'
@@ -7,10 +14,13 @@ export type EmployeeView =
   | 'payments'
   | 'account'
 
+/** Secciones persistentes que aparecen en la navegación principal. */
 export type PrimaryEmployeeSection = 'menu' | 'orders' | 'payments' | 'account'
 
+/** Destinos de entrega simulados durante la personalización del pedido. */
 export type DeliveryLocation = 'office' | 'home'
 
+/** Resumen suficiente para mostrar un pedido en próximos o historial. */
 export type EmployeeOrder = {
   id: string
   dishName: string
@@ -21,6 +31,7 @@ export type EmployeeOrder = {
   status: 'confirmed' | 'pending' | 'delivered'
 }
 
+/** Estado de cuenta agrupado por proveedor y período. */
 export type ProviderPayment = {
   id: string
   providerName: string

@@ -1,8 +1,9 @@
 import { Application } from "@hotwired/stimulus"
 
+// Instancia compartida donde se registran los controladores Stimulus tradicionales.
 const application = Application.start()
 
-// Configure Stimulus development experience
+// Mantener `debug` desactivado evita ruido de Stimulus durante el trabajo en React.
 application.debug = false
 window.Stimulus   = application
 

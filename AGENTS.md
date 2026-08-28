@@ -174,6 +174,8 @@ Mantener cada flujo dentro del frontend del rol correspondiente. La migración f
 - No instalar paquetes sin explicar por qué los componentes actuales o React no alcanzan.
 - Mantener los textos de la interfaz en español.
 - Utilizar HTML semántico, labels, estados `aria-pressed`, `aria-current` y nombres accesibles cuando correspondan.
+- Documentar módulos y flujos no evidentes con comentarios breves que expliquen intención, límites del mock y decisiones de arquitectura.
+- Evitar comentarios que sólo repitan la sintaxis; priorizar el motivo por el que existe cada estado, cálculo o adaptación responsive.
 
 ## Ejecución local
 

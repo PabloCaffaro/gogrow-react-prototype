@@ -1,3 +1,8 @@
+/**
+ * Acceso único al prototipo.
+ * Rails autentica la cuenta; React sólo controla la presentación, los campos y
+ * los atajos que completan credenciales ficticias para cada rol.
+ */
 import { Head, Link, useForm } from '@inertiajs/react'
 import { FormEvent, useState } from 'react'
 import { Check, Eye, EyeOff, UtensilsCrossed } from 'lucide-react'
@@ -10,21 +15,27 @@ import { Label } from '@/components/ui/forms/label'
 import { Separator } from '@/components/ui/layout/separator'
 import styles from './login.module.css'
 
+/** Cuentas locales que permiten recorrer los tres perfiles sin escribir credenciales. */
 const demoAccounts = [
   { email: 'empleado@demo.com', label: 'Empleado' },
   { email: 'admin@demo.com', label: 'Administrador' },
   { email: 'proveedor@demo.com', label: 'Proveedor' },
 ]
 
+/** Beneficios de producto usados únicamente en el panel editorial de escritorio. */
 const productBenefits = [
   'Menús semanales en un solo lugar',
   'Beneficio y pedidos siempre visibles',
   'Pagos organizados por proveedor',
 ]
 
+/** Formulario responsive conectado al endpoint de sesión existente. */
 export default function Login() {
+  // Estados exclusivamente visuales del acceso.
   const [showPassword, setShowPassword] = useState(false)
   const [selectedDemo, setSelectedDemo] = useState<string | null>(null)
+
+  // Este estado mantiene visibles los valores; `useForm` conserva la copia que se envía a Rails.
   const [credentials, setCredentials] = useState({ email: '', password: '', remember: false })
   const { setData, post, processing, errors, clearErrors } = useForm({
     email: '',
@@ -32,6 +43,7 @@ export default function Login() {
     remember: false,
   })
 
+  /** Completa y resalta una cuenta demo, pero espera el submit explícito del usuario. */
   const fillDemo = (email: string) => {
     setSelectedDemo(email)
     setCredentials((current) => ({ ...current, email, password: 'demo1234' }))
@@ -43,6 +55,7 @@ export default function Login() {
     }))
   }
 
+  /** Delega validación y redirección al controlador Rails mediante Inertia. */
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     post('/login', { preserveScroll: true })

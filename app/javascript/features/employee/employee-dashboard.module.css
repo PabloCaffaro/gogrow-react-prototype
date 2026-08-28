@@ -1,3 +1,4 @@
+/* Contenedor mobile-first y convenciones de interacción compartidas por todo el rol. */
 .page {
   min-height: 100vh;
   background: #ffffff;
@@ -71,6 +72,7 @@
   margin-top: 20px;
 }
 
+/* Resumen del cupo semanal y su barra de progreso. */
 .benefitCard {
   padding: 17px 16px 16px;
   border: 1px solid #e4e4e4;
@@ -142,6 +144,7 @@
   display: none;
 }
 
+/* Selectores del día y proveedor que controlan el catálogo visible. */
 .daySelector {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -206,6 +209,7 @@
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.11);
 }
 
+/* Tarjetas de platos y variante vacía cuando el filtro no devuelve resultados. */
 .menuList {
   display: grid;
   gap: 10px;
@@ -306,6 +310,7 @@
   display: none;
 }
 
+/* Navegación principal flotante exclusiva de teléfonos. */
 .mobileNavigation {
   position: fixed;
   z-index: 20;
@@ -348,6 +353,7 @@
   font-weight: 700;
 }
 
+/* Acción contextual que aparece después de seleccionar una vianda en móvil. */
 .mobileSelection {
   position: fixed;
   z-index: 19;
@@ -402,6 +408,7 @@
 }
 
 @media (min-width: 900px) {
+  /* Escritorio: navegación lateral, grilla de platos y resumen del pedido. */
   .page {
     display: grid;
     grid-template-columns: 244px minmax(0, 1fr);
@@ -691,6 +698,7 @@
 }
 
 @media (min-width: 1180px) {
+  /* En monitores amplios se garantiza un ancho mínimo cómodo para cada plato. */
   .menuList {
     grid-template-columns: repeat(2, minmax(260px, 1fr));
   }

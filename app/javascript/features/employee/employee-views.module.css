@@ -1,8 +1,10 @@
+/* Base común de las subpantallas: detalle, checkout, pedidos, pagos y cuenta. */
 .view {
   width: 100%;
   padding-bottom: 24px;
 }
 
+/* Encabezado reutilizable con retorno opcional para los pasos del pedido. */
 .screenHeader {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -57,6 +59,7 @@
   width: 18px;
 }
 
+/* Detalle del plato y superficies usadas para personalización. */
 .detailGrid,
 .checkoutGrid,
 .accountGrid {
@@ -211,6 +214,7 @@ fieldset.surface {
   text-align: right;
 }
 
+/* Columna de cantidad, entrega y acciones para continuar. */
 .orderPanel {
   display: grid;
   align-content: start;
@@ -279,6 +283,7 @@ fieldset.surface {
   display: none;
 }
 
+/* Acción fija en móvil; en escritorio la reemplaza una tarjeta lateral. */
 .mobileActionBar {
   position: fixed;
   z-index: 18;
@@ -326,6 +331,7 @@ fieldset.surface {
   cursor: pointer;
 }
 
+/* Checkout: resumen del plato, información de entrega y desglose del beneficio. */
 .orderSummaryCard {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -429,6 +435,7 @@ fieldset.surface {
   display: none;
 }
 
+/* Confirmación posterior a crear el pedido simulado. */
 .successView {
   display: flex;
   max-width: 560px;
@@ -526,6 +533,7 @@ fieldset.surface {
   color: #171717;
 }
 
+/* Pedidos: selector de pestañas y tarjetas de próximos/históricos. */
 .tabList {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -643,6 +651,7 @@ fieldset.surface {
   width: 17px;
 }
 
+/* Pagos: deuda total, cuenta bancaria y comprobante simulado. */
 .debtCard {
   display: flex;
   min-height: 130px;
@@ -756,6 +765,7 @@ fieldset.surface {
   width: 14px;
 }
 
+/* Cuenta: identidad, notificaciones, beneficio y cierre de sesión. */
 .profileCard {
   display: flex;
   align-items: center;
@@ -925,6 +935,7 @@ fieldset.surface {
 }
 
 @media (min-width: 900px) {
+  /* Las subpantallas pasan a dos columnas y eliminan las acciones fijas. */
   .screenHeader {
     margin-bottom: 28px;
   }

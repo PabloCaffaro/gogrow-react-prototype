@@ -1,3 +1,8 @@
+/**
+ * Pantallas secundarias del empleado.
+ * Reciben estado y callbacks desde `EmployeeDashboard`, de modo que la capa visual
+ * pueda migrarse a servicios reales sin reescribir el flujo completo.
+ */
 import { router } from '@inertiajs/react'
 import { useState } from 'react'
 import {
@@ -32,6 +37,7 @@ type ScreenHeaderProps = {
   onBack?: () => void
 }
 
+/** Encabezado común con retorno opcional para los pasos lineales del pedido. */
 function ScreenHeader({ eyebrow, title, description, onBack }: ScreenHeaderProps) {
   return (
     <header className={styles.screenHeader}>
@@ -63,6 +69,10 @@ type DetailProps = {
   onReview: () => void
 }
 
+/**
+ * Permite personalizar una vianda antes del checkout.
+ * No confirma ni persiste: comunica cada cambio al estado mantenido por el dashboard.
+ */
 export function DishDetailView({
   dish,
   quantity,
@@ -76,6 +86,7 @@ export function DishDetailView({
   onDeliveryChange,
   onReview,
 }: DetailProps) {
+  // En el prototipo `price` ya representa el precio unitario con beneficio.
   const total = dish.price * quantity
 
   return (
@@ -209,6 +220,10 @@ type CheckoutProps = {
   onConfirm: () => void
 }
 
+/**
+ * Paso de revisión final. Separa precio de lista, subsidio simulado y total a pagar
+ * para validar cómo se comunica el beneficio al empleado.
+ */
 export function CheckoutView({
   dish,
   quantity,
@@ -218,6 +233,7 @@ export function CheckoutView({
   onBack,
   onConfirm,
 }: CheckoutProps) {
+  // Escenario temporal: el beneficio cubre el 50 % del precio de lista.
   const subtotal = dish.price * quantity * 2
   const benefit = dish.price * quantity
   const total = dish.price * quantity
@@ -288,6 +304,7 @@ type SuccessProps = {
   onMenu: () => void
 }
 
+/** Confirmación puramente visual que ofrece volver al menú o consultar pedidos. */
 export function OrderSuccessView({ dish, quantity, delivery, onOrders, onMenu }: SuccessProps) {
   return (
     <section className={`${styles.view} ${styles.successView}`}>
@@ -314,6 +331,7 @@ export function OrderSuccessView({ dish, quantity, delivery, onOrders, onMenu }:
   )
 }
 
+/** Tarjeta reutilizada por pedidos próximos e históricos. */
 function OrderCard({ order }: { order: EmployeeOrder }) {
   const labels = {
     confirmed: 'Confirmado',
@@ -337,6 +355,7 @@ function OrderCard({ order }: { order: EmployeeOrder }) {
   )
 }
 
+/** Alterna entre dos colecciones mock sin pedir información al backend. */
 export function OrdersView({ onMenu }: { onMenu: () => void }) {
   const [tab, setTab] = useState<'upcoming' | 'history'>('upcoming')
   const orders = tab === 'upcoming' ? upcomingOrders : orderHistory
@@ -371,12 +390,18 @@ export function OrdersView({ onMenu }: { onMenu: () => void }) {
   )
 }
 
+/**
+ * Estado de cuenta ficticio por proveedor.
+ * `sentPayments` permite demostrar el cambio de estado del comprobante durante la sesión.
+ */
 export function PaymentsView() {
   const [sentPayments, setSentPayments] = useState<string[]>([])
+  // La deuda se deriva de los pagos no cerrados para evitar mantener un total duplicado.
   const totalDebt = providerPayments
     .filter((payment) => payment.status !== 'paid')
     .reduce((total, payment) => total + payment.amount, 0)
 
+  /** Marca localmente un comprobante como enviado; se reinicia al recargar. */
   const sendReceipt = (paymentId: string) => {
     setSentPayments((current) => current.includes(paymentId) ? current : [...current, paymentId])
   }
@@ -428,9 +453,11 @@ export function PaymentsView() {
   )
 }
 
+/** Preferencias del empleado; sólo cerrar sesión realiza una petición real a Rails. */
 export function AccountView({ email }: { email: string }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
 
+  // La sesión sí pertenece al backend existente, por eso utiliza el endpoint real.
   const logout = () => router.delete('/logout')
 
   return (

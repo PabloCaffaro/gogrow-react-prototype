@@ -1,3 +1,4 @@
+/* Base mobile-first: marca, formulario y accesos demo en una única columna. */
 .page {
   min-height: 100vh;
   padding: 16px;
@@ -53,6 +54,7 @@
   margin: 4px 0 24px;
 }
 
+/* Tarjeta de autenticación y jerarquía de su encabezado. */
 .loginCard {
   overflow: hidden;
   border: 1px solid #dededb;
@@ -86,6 +88,7 @@
   font-size: 0.86rem;
 }
 
+/* Campos controlados y vínculos auxiliares del formulario. */
 .form {
   display: grid;
   gap: 18px;
@@ -98,6 +101,7 @@
 
 .fieldHeader,
 .rememberRow,
+/* Separador y botones que completan las cuentas ficticias. */
 .demoDivider {
   display: flex;
   align-items: center;
@@ -288,6 +292,7 @@
 }
 
 @media (min-width: 640px) {
+  /* Teléfonos grandes y tablets reciben más aire dentro de la tarjeta. */
   .page {
     padding: 24px;
   }
@@ -308,6 +313,7 @@
 }
 
 @media (min-width: 960px) {
+  /* Escritorio: panel editorial y acceso ocupan columnas exactamente iguales. */
   .layout {
     --desktop-panel-height: min(760px, calc(100vh - 48px));
 
@@ -456,6 +462,7 @@
 }
 
 @media (max-width: 360px) {
+  /* Evita comprimir los tres perfiles en teléfonos especialmente angostos. */
   .demoButtons {
     grid-template-columns: 1fr;
   }
