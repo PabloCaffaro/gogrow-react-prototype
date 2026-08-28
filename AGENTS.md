@@ -91,8 +91,23 @@ El flujo más desarrollado es el dashboard del empleado:
 - Consulta de próximos pedidos e historial.
 - Estado de cuenta por proveedor y simulación de comprobantes.
 - Perfil, beneficio asignado y preferencia de notificaciones.
+- Estado vacío demostrable: el viernes 14 no tiene viandas publicadas.
+- Estados `hover` para puntero y `focus-visible` para navegación con teclado.
 - Navegación inferior en móvil.
 - Navegación lateral en escritorio.
+
+El inicio de sesión también fue adaptado al lenguaje visual del producto:
+
+- Mensaje centrado en el beneficio de GoGrow, sin explicaciones didácticas del stack.
+- Formulario compacto en móvil.
+- Dos paneles del mismo ancho y alto desde `960px`.
+- Accesos rápidos visibles para las cuentas demo de empleado, administrador y proveedor.
+- El perfil demo seleccionado queda resaltado y completa las credenciales.
+- No mostrar en la interfaz referencias a Rails, PostgreSQL u otros detalles internos.
+
+El antiguo laboratorio de formularios fue eliminado por completo. La ruta
+`/ejemplos/formularios`, su controlador y sus componentes ya no forman parte del
+prototipo y no deben recrearse salvo solicitud explícita.
 
 Archivos principales:
 
@@ -105,6 +120,8 @@ Archivos principales:
 - `app/javascript/domain/employee.ts`
 - `app/javascript/domain/menu.ts`
 - `app/javascript/pages/dashboard/show.tsx`
+- `app/javascript/pages/auth/login.tsx`
+- `app/javascript/pages/auth/login.module.css`
 
 Los dashboards de proveedor y administrador todavía conservan el contenido genérico del proyecto base.
 
@@ -195,6 +212,10 @@ proveedor@demo.com
 ```
 
 La pantalla de login tiene botones que completan estas credenciales.
+
+Estos accesos deben permanecer visibles mientras el repositorio siga siendo un
+prototipo compartido. Pueden presentarse de manera integrada con el diseño final,
+pero no deben ocultarse o eliminarse sin una solicitud explícita.
 
 PostgreSQL se utiliza actualmente para estas cuentas, la autenticación y las pruebas relacionadas. Los datos de viandas siguen siendo mocks frontend.
 
