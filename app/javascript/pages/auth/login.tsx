@@ -3,7 +3,7 @@
  * Rails autentica la cuenta; React sólo controla la presentación, los campos y
  * los atajos que completan credenciales ficticias para cada rol.
  */
-import { Head, Link, useForm } from '@inertiajs/react'
+import { Head, Link, router, useForm } from '@inertiajs/react'
 import { FormEvent, useState } from 'react'
 import { Check, Eye, EyeOff, UtensilsCrossed } from 'lucide-react'
 
@@ -106,6 +106,17 @@ export default function Login() {
               </CardHeader>
 
               <CardContent className={styles.cardContent}>
+                <button
+                  type="button"
+                  className={styles.googleButton}
+                  onClick={() => router.post('/login', { email: 'proveedor@demo.com', password: 'demo1234', remember: false })}
+                >
+                  <span aria-hidden="true">G</span>
+                  Continuar con Google como proveedor
+                </button>
+
+                <div className={styles.loginDivider}><Separator /><span>o ingresá con tu email</span><Separator /></div>
+
                 <form className={styles.form} onSubmit={submit} noValidate>
                   {errors.email && (
                     <Alert variant="destructive" role="alert">

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/data-display/card'
 import { EmployeeDashboard } from '@/features/employee/employee-dashboard'
+import { ProviderDashboard } from '@/features/provider/provider-dashboard'
 import styles from './show.module.css'
 
 /** Limitar el rol a estos valores evita estados imposibles en TypeScript. */
@@ -51,6 +52,10 @@ export default function Dashboard({ role, role_info: roleInfo, email }: Props) {
   // El empleado utiliza el prototipo desarrollado; los otros roles conservan el panel base.
   if (role === 'empleado') {
     return <EmployeeDashboard email={email} />
+  }
+
+  if (role === 'proveedor') {
+    return <ProviderDashboard email={email} />
   }
 
   const data = roleData[role]
