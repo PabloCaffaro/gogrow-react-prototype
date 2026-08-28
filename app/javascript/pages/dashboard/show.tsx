@@ -4,6 +4,7 @@ import { Building2, ClipboardCheck, LogOut, PackageCheck, ShieldCheck, Users } f
 import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/data-display/card'
+import { EmployeeDashboard } from '@/features/employee/employee-dashboard'
 import styles from './show.module.css'
 
 /** Limitar el rol a estos valores evita estados imposibles en TypeScript. */
@@ -47,6 +48,10 @@ const roleData = {
 
 /** Dashboard reutilizable que adapta su contenido y color al rol autenticado. */
 export default function Dashboard({ role, role_info: roleInfo, email }: Props) {
+  if (role === 'empleado') {
+    return <EmployeeDashboard email={email} />
+  }
+
   const data = roleData[role]
 
   // Guardar el componente en una variable permite renderizar un ícono diferente por rol.
