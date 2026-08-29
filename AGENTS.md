@@ -233,6 +233,8 @@ carpeta `public/` como si fuera un sitio estático.
 
 - `Dockerfile` continúa siendo la configuración de Docker Compose local.
 - `Dockerfile.vercel` construye la imagen de producción que detecta Vercel.
+- `vercel.json` anula cualquier `Output Directory` estático configurado con
+  anterioridad para que el tráfico llegue al contenedor.
 - Puma obtiene el puerto de ejecución desde `PORT`, variable asignada por la
   plataforma.
 - En Vercel, `Root Directory` debe apuntar a la raíz del repositorio y
