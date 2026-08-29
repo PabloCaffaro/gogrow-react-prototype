@@ -1,12 +1,13 @@
 import type { Dish, MenuDay } from '@/domain/menu'
 
-/** Identidad y consumo semanal ficticios usados en la portada del empleado. */
+/** Identidad y consumo mensual ficticios usados en la portada del empleado. */
 export const employeePrototype = {
   name: 'Sofía',
   dateLabel: 'Lunes, 26 de mayo',
   benefit: {
-    used: 2,
-    weeklyLimit: 5,
+    usedThisMonth: 8,
+    monthlyLimit: 20,
+    usedThisWeek: 2,
   },
 }
 

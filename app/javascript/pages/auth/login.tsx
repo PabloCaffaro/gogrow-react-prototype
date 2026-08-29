@@ -7,6 +7,7 @@ import { Head, Link, router, useForm } from '@inertiajs/react'
 import { FormEvent, useState } from 'react'
 import { Check, Eye, EyeOff, UtensilsCrossed } from 'lucide-react'
 
+import { GoogleMark } from '@/components/branding/google-mark'
 import { Button } from '@/components/ui/actions/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/data-display/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/feedback/alert'
@@ -111,8 +112,8 @@ export default function Login() {
                   className={styles.googleButton}
                   onClick={() => router.post('/login', { email: 'proveedor@demo.com', password: 'demo1234', remember: false })}
                 >
-                  <span aria-hidden="true">G</span>
-                  Continuar con Google como proveedor
+                  <GoogleMark />
+                  Continuar con Google
                 </button>
 
                 <div className={styles.loginDivider}><Separator /><span>o ingresá con tu email</span><Separator /></div>

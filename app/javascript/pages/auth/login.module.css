@@ -111,10 +111,10 @@
   cursor: pointer;
 }
 
-.googleButton span {
-  color: #4285f4;
-  font-size: 1rem;
-  font-weight: 800;
+.googleButton svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
 }
 
 .googleButton:hover { background: #f6f6f3; }
@@ -165,14 +165,24 @@
   border-radius: 10px;
   background: #fafaf8;
   color: #171717;
+  caret-color: #171717;
+  cursor: text;
   font: inherit;
   font-size: 0.84rem;
   outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .field input::placeholder {
   color: #969692;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .field input:hover {
+    border-color: #b8b8b3;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgb(23 23 23 / 0.05);
+  }
 }
 
 .field input:focus-visible {

@@ -79,7 +79,7 @@ Por defecto, los cambios realizados por el usuario en la interfaz se mantienen s
 El flujo más desarrollado es el dashboard del empleado:
 
 - Saludo y fecha.
-- Resumen del beneficio semanal.
+- Resumen del beneficio mensual: 20 viandas; la semana se muestra sólo como actividad.
 - Barra de progreso de viandas utilizadas.
 - Selector de días.
 - Filtro por proveedor.
@@ -103,7 +103,28 @@ El inicio de sesión también fue adaptado al lenguaje visual del producto:
 - Dos paneles del mismo ancho y alto desde `960px`.
 - Accesos rápidos visibles para las cuentas demo de empleado, administrador y proveedor.
 - El perfil demo seleccionado queda resaltado y completa las credenciales.
+- El acceso simulado con Google usa una marca multicolor y texto neutral respecto al rol.
+- Los campos muestran borde y sombra al pasar el puntero, cursor de texto y caret oscuro explícitos.
 - No mostrar en la interfaz referencias a Rails, PostgreSQL u otros detalles internos.
+
+El dashboard del proveedor ya cuenta con navegación y flujos mock para inicio,
+menús, pedidos, cobros, métricas y cuenta. El dashboard del administrador se
+encuentra en su primera etapa funcional:
+
+- Navegación entre inicio, empleados, liquidaciones, métricas y cuenta.
+- Barra inferior en móvil y lateral en escritorio.
+- Resumen de organización, actividad reciente y distribución por proveedor.
+- Listado de empleados con filtros por excepción, aporte, deuda y nivel de consumo.
+- Detalle de empleado con resumen, pedidos, saldos y configuración individual.
+- Beneficio permanente y excepción temporal editable en estado React.
+- Liquidaciones por proveedor sin simular programación bancaria.
+- Métricas accesibles tanto desde escritorio como desde la navegación móvil.
+- Marca GoGrow clickeable que vuelve al inicio principal en los tres roles.
+- Contenido administrativo centralizado en mocks TypeScript, sin persistencia.
+
+En móvil no deben desaparecer secciones presentes en escritorio. El proveedor
+expone también Métricas en su barra inferior; el empleado mantiene Menú,
+Pedidos, Pagos y Cuenta.
 
 El antiguo laboratorio de formularios fue eliminado por completo. La ruta
 `/ejemplos/formularios`, su controlador y sus componentes ya no forman parte del
@@ -119,11 +140,17 @@ Archivos principales:
 - `app/javascript/mocks/employee-sections.ts`
 - `app/javascript/domain/employee.ts`
 - `app/javascript/domain/menu.ts`
+- `app/javascript/features/provider/provider-dashboard.tsx`
+- `app/javascript/features/provider/provider-dashboard.module.css`
+- `app/javascript/features/admin/admin-dashboard.tsx`
+- `app/javascript/features/admin/admin-dashboard.module.css`
+- `app/javascript/mocks/provider.ts`
+- `app/javascript/mocks/admin.ts`
+- `app/javascript/domain/provider.ts`
+- `app/javascript/domain/admin.ts`
 - `app/javascript/pages/dashboard/show.tsx`
 - `app/javascript/pages/auth/login.tsx`
 - `app/javascript/pages/auth/login.module.css`
-
-Los dashboards de proveedor y administrador todavía conservan el contenido genérico del proyecto base.
 
 ## Diseño responsive
 
@@ -266,12 +293,20 @@ Una etapa se considera completa cuando:
 - No versionar contraseñas reales, tokens, `.env` locales ni credenciales externas.
 - Las cuentas `@demo.com` y su contraseña existen solamente para el prototipo local.
 
+## Reglas de beneficio confirmadas
+
+- El beneficio estándar es de 20 viandas por mes, no 5 por semana.
+- La empresa aporta por defecto el 50%, pero cada empleado puede tener una configuración permanente diferente.
+- Un beneficio temporal puede reemplazar cantidad y porcentaje entre dos fechas; al vencer vuelve la configuración permanente.
+- El consumo semanal puede mostrarse sólo como desglose informativo del total mensual.
+- Todos los empleados incluidos en esta etapa cuentan con beneficio; no usar estados activo/pausado para representarlo.
+
 ## Decisiones todavía provisionales
 
 No asumir como definitivos:
 
 - Autenticación con email y contraseña: el producto final podría usar Google.
-- Reglas exactas del subsidio semanal y mensual.
+- Comportamiento al superar las 20 viandas o agotar el cupo mensual.
 - Stock real por proveedor.
 - Importación de menús desde Excel.
 - Validación de comprobantes.

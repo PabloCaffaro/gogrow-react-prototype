@@ -53,25 +53,26 @@ const primaryViews: Record<PrimaryEmployeeSection, {
 
 /** Resumen reutilizado en la portada móvil y en la columna lateral de escritorio. */
 function BenefitCard() {
-  const { used, weeklyLimit } = employeePrototype.benefit
-  const progress = `${Math.round((used / weeklyLimit) * 100)}%`
+  const { usedThisMonth, monthlyLimit, usedThisWeek } = employeePrototype.benefit
+  const progress = `${Math.round((usedThisMonth / monthlyLimit) * 100)}%`
 
   return (
     <section className={styles.benefitCard} aria-labelledby="benefit-title">
       <div className={styles.benefitHeader}>
         <p id="benefit-title">Tu beneficio</p>
-        <span>Esta semana</span>
+        <span>Este mes</span>
       </div>
       <p className={styles.benefitValue}>
-        {used} de {weeklyLimit} viandas pedidas
+        {usedThisMonth} de {monthlyLimit} viandas pedidas
       </p>
+      <p className={styles.benefitWeek}><strong>{usedThisWeek}</strong> viandas pedidas esta semana</p>
       <div
         className={styles.progressTrack}
         role="progressbar"
         aria-valuemin={0}
-        aria-valuemax={weeklyLimit}
-        aria-valuenow={used}
-        aria-label={`${used} de ${weeklyLimit} viandas pedidas`}
+        aria-valuemax={monthlyLimit}
+        aria-valuenow={usedThisMonth}
+        aria-label={`${usedThisMonth} de ${monthlyLimit} viandas pedidas este mes`}
       >
         <span style={{ width: progress }} />
       </div>
@@ -319,10 +320,15 @@ export function EmployeeDashboard({ email }: Props) {
   return (
     <div className={styles.page}>
       <aside className={styles.desktopSidebar}>
-        <div className={styles.brand}>
+        <button
+          type="button"
+          className={styles.brand}
+          onClick={() => navigate('menu')}
+          aria-label="Ir al menú principal del empleado"
+        >
           <span className={styles.brandMark}><UtensilsCrossed aria-hidden="true" /></span>
           <span>GoGrow Meals</span>
-        </div>
+        </button>
 
         <nav className={styles.desktopNavigation} aria-label="Navegación principal">
           {(Object.entries(primaryViews) as Array<[
