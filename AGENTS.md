@@ -226,6 +226,23 @@ docker compose down
 
 Docker ya tiene configurado polling para detectar cambios desde Windows y carpetas sincronizadas con OneDrive.
 
+## Despliegue del prototipo en Vercel
+
+Vercel debe ejecutar este repositorio como contenedor; no debe publicar la
+carpeta `public/` como si fuera un sitio estático.
+
+- `Dockerfile` continúa siendo la configuración de Docker Compose local.
+- `Dockerfile.vercel` construye la imagen de producción que detecta Vercel.
+- Puma obtiene el puerto de ejecución desde `PORT`, variable asignada por la
+  plataforma.
+- En Vercel, `Root Directory` debe apuntar a la raíz del repositorio y
+  `Output Directory` debe permanecer vacío, sin un override a `public/`.
+- La única variable sensible propia de la aplicación es `SECRET_KEY_BASE`.
+- No agregar `DATABASE_URL`: el prototipo no utiliza una base de datos.
+
+Los cambios en variables de entorno o en la configuración del proyecto sólo se
+aplican después de generar un deployment nuevo.
+
 ## Cuentas de demostración
 
 Todas utilizan la contraseña `demo1234`.
