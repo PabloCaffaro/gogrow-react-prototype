@@ -8,15 +8,21 @@ class SessionsController < InertiaController
     render inertia: "auth/login"
   end
 
-  # Normaliza las credenciales, autentica con `has_secure_password` y dirige al rol correcto.
+  # Valida contra las cuentas públicas del prototipo y dirige al rol correcto.
+  # No existe persistencia: al modificar DemoAccount se actualiza todo el flujo demo.
   def create
     credentials = params.permit(:email, :password, :remember)
-    user = User.find_by(email: credentials[:email].to_s.strip.downcase)
+    user = DemoAccount.authenticate(
+      email: credentials[:email],
+      password: credentials[:password]
+    )
 
-    if user&.active? && user.authenticate(credentials[:password])
+    if user
       reset_session
-      session[:user_id] = user.id
-      cookies.permanent.signed[:remembered_user_id] = user.id if ActiveModel::Type::Boolean.new.cast(credentials[:remember])
+      session[:demo_email] = user.email
+      if ActiveModel::Type::Boolean.new.cast(credentials[:remember])
+        cookies.permanent.signed[:remembered_demo_email] = user.email
+      end
       redirect_to dashboard_path(user.role)
     else
       redirect_to login_path, inertia: {
@@ -28,7 +34,7 @@ class SessionsController < InertiaController
   # Elimina tanto la sesión temporal como la cookie opcional de larga duración.
   def destroy
     reset_session
-    cookies.delete(:remembered_user_id)
+    cookies.delete(:remembered_demo_email)
     redirect_to login_path, notice: "La sesión se cerró correctamente."
   end
 end

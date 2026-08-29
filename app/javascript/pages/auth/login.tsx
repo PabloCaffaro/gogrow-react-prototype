@@ -3,7 +3,7 @@
  * Rails autentica la cuenta; React sólo controla la presentación, los campos y
  * los atajos que completan credenciales ficticias para cada rol.
  */
-import { Head, Link, router, useForm } from '@inertiajs/react'
+import { Head, Link, useForm } from '@inertiajs/react'
 import { FormEvent, useState } from 'react'
 import { Check, Eye, EyeOff, UtensilsCrossed } from 'lucide-react'
 
@@ -36,9 +36,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [selectedDemo, setSelectedDemo] = useState<string | null>(null)
 
-  // Este estado mantiene visibles los valores; `useForm` conserva la copia que se envía a Rails.
-  const [credentials, setCredentials] = useState({ email: '', password: '', remember: false })
-  const { setData, post, processing, errors, clearErrors } = useForm({
+  // `data` es la única fuente de verdad del formulario para que los valores
+  // visibles sean exactamente los mismos que Inertia envía al servidor.
+  const { data, setData, post, processing, errors, clearErrors } = useForm({
     email: '',
     password: '',
     remember: false,
@@ -47,13 +47,12 @@ export default function Login() {
   /** Completa y resalta una cuenta demo, pero espera el submit explícito del usuario. */
   const fillDemo = (email: string) => {
     setSelectedDemo(email)
-    setCredentials((current) => ({ ...current, email, password: 'demo1234' }))
     clearErrors()
-    setData((current) => ({
-      ...current,
+    setData({
       email,
       password: 'demo1234',
-    }))
+      remember: data.remember,
+    })
   }
 
   /** Delega validación y redirección al controlador Rails mediante Inertia. */
@@ -110,7 +109,7 @@ export default function Login() {
                 <button
                   type="button"
                   className={styles.googleButton}
-                  onClick={() => router.post('/login', { email: 'proveedor@demo.com', password: 'demo1234', remember: false })}
+                  aria-disabled="true"
                 >
                   <GoogleMark />
                   Continuar con Google
@@ -133,11 +132,8 @@ export default function Login() {
                       type="email"
                       autoComplete="email"
                       placeholder="nombre@empresa.com"
-                      value={credentials.email}
-                      onChange={(event) => {
-                        setCredentials((current) => ({ ...current, email: event.target.value }))
-                        setData('email', event.target.value)
-                      }}
+                      value={data.email}
+                      onChange={(event) => setData('email', event.target.value)}
                     />
                   </div>
 
@@ -155,11 +151,8 @@ export default function Login() {
                         type={showPassword ? 'text' : 'password'}
                         autoComplete="current-password"
                         className={styles.passwordInput}
-                        value={credentials.password}
-                        onChange={(event) => {
-                          setCredentials((current) => ({ ...current, password: event.target.value }))
-                          setData('password', event.target.value)
-                        }}
+                        value={data.password}
+                        onChange={(event) => setData('password', event.target.value)}
                       />
                       <button
                         type="button"
@@ -179,10 +172,9 @@ export default function Login() {
                   <div className={styles.rememberRow}>
                     <Checkbox
                       id="remember"
-                      checked={credentials.remember}
+                      checked={data.remember}
                       onCheckedChange={(checked) => {
                         const remember = checked === true
-                        setCredentials((current) => ({ ...current, remember }))
                         setData('remember', remember)
                       }}
                     />

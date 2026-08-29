@@ -1,6 +1,6 @@
 # Prototipo frontend GoGrow
 
-Proyecto independiente para desarrollar el prototipo frontend de GoGrow. Rails, Inertia.js y PostgreSQL forman parte del entorno ya configurado, pero las nuevas funcionalidades del dominio se implementarán en React con datos mock, sin agregar lógica de negocio al backend durante esta etapa.
+Proyecto independiente para desarrollar el prototipo frontend de GoGrow. Rails e Inertia.js entregan las páginas React, pero tanto las cuentas demo como los datos del dominio viven en memoria y no requieren una base de datos.
 
 ## Tecnologías
 
@@ -9,7 +9,6 @@ Proyecto independiente para desarrollar el prototipo frontend de GoGrow. Rails, 
 - Inertia.js 3
 - Vite 8
 - Tailwind CSS 4 + shadcn/ui
-- PostgreSQL 16
 - Docker Compose
 
 AWS forma parte del stack objetivo de despliegue, pero no es necesario para ejecutar el prototipo local.
@@ -25,13 +24,11 @@ docker compose up --build
 
 Abrir <http://localhost:3000>.
 
-Para detener los servicios sin borrar datos:
+Para detener el servicio:
 
 ```powershell
 docker compose down
 ```
-
-No usar `docker compose down -v` salvo que se quiera eliminar también la base de datos local.
 
 ## Cuentas de prueba
 
@@ -50,8 +47,8 @@ Los botones de la pantalla de login completan automáticamente estas credenciale
 1. La persona abre el login.
 2. Ingresa correo y contraseña.
 3. React envía el formulario a Rails mediante Inertia.
-4. Rails busca el usuario en PostgreSQL y verifica la contraseña cifrada con bcrypt.
-5. Rails crea una sesión y redirige al panel correspondiente.
+4. Rails valida el acceso contra las cuentas demo definidas en código.
+5. Rails crea una sesión firmada y redirige al panel correspondiente.
 6. Un usuario no puede acceder al panel de otro rol.
 7. Al cerrar sesión, Rails elimina la sesión y regresa al login.
 8. El flujo de recuperación valida el correo y muestra una confirmación simulada. El envío real de email queda pendiente de configurar un proveedor de correo.
@@ -60,8 +57,8 @@ Los botones de la pantalla de login completan automáticamente estas credenciale
 
 - Las pantallas nuevas vivirán en `app/javascript`.
 - Los menús, pedidos, proveedores, subsidios y pagos se representarán con datos mock de TypeScript.
-- No se agregarán modelos, migraciones, controladores ni persistencia para esas funcionalidades durante este prototipo.
-- PostgreSQL se conserva únicamente para la autenticación ya incluida en el proyecto base.
+- No se agregarán modelos persistidos, migraciones ni lógica de base de datos durante este prototipo.
+- La autenticación demo también funciona en memoria y no requiere PostgreSQL.
 - La navegación y las interacciones de las pantallas nuevas se resolverán del lado de React.
 
 ## Archivos principales
@@ -71,10 +68,8 @@ Los botones de la pantalla de login completan automáticamente estas credenciale
 - `app/javascript/pages/dashboard/show.tsx`: panel adaptado al rol.
 - `app/controllers/sessions_controller.rb`: creación y cierre de sesiones.
 - `app/controllers/dashboards_controller.rb`: autorización según rol.
-- `app/models/user.rb`: usuario, roles y contraseña segura.
-- `db/migrate/20260826000000_create_users.rb`: tabla de usuarios.
-- `db/seeds.rb`: cuentas de demostración.
-- `docker-compose.yml`: Rails, Vite y PostgreSQL para desarrollo.
+- `app/models/demo_account.rb`: cuentas ficticias y roles disponibles.
+- `docker-compose.yml`: Rails y Vite para desarrollo.
 
 ## Comandos útiles
 
@@ -87,13 +82,7 @@ docker compose exec web npm run check
 Ejecutar pruebas Rails:
 
 ```powershell
-docker compose exec -e RAILS_ENV=test -e DATABASE_URL=postgresql://postgres:postgres@db/gogrow_test web bin/rails db:test:prepare test
-```
-
-Volver a cargar las cuentas demo:
-
-```powershell
-docker compose exec web bin/rails db:seed
+docker compose exec -e RAILS_ENV=test web bin/rails test
 ```
 
 Ver logs:

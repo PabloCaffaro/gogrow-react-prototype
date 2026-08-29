@@ -1,6 +1,15 @@
 require_relative "boot"
 
-require "rails/all"
+# El prototipo no persiste datos. Cargamos únicamente los componentes de Rails
+# que usa la capa Inertia y dejamos Active Record fuera del proceso.
+require "rails"
+require "active_model/railtie"
+require "active_job/railtie"
+require "action_controller/railtie"
+require "action_mailer/railtie"
+require "action_view/railtie"
+require "action_cable/engine"
+require "sprockets/railtie"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.

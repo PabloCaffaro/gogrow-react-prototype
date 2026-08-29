@@ -22,9 +22,8 @@ El repositorio contiene un entorno completo ya configurado:
 - React 19 y TypeScript estricto.
 - Vite 8.
 - Tailwind CSS 4 y componentes inspirados en shadcn/ui.
-- PostgreSQL 16.
 
-Rails, Inertia y PostgreSQL son infraestructura preexistente. Durante la etapa de prototipado, las funcionalidades nuevas del dominio deben implementarse exclusivamente en frontend.
+Rails e Inertia entregan las páginas React. El prototipo no utiliza Active Record ni una base de datos: las cuentas demo están definidas en código y los datos funcionales se mantienen en mocks TypeScript.
 
 ## Regla principal de implementación
 
@@ -35,7 +34,6 @@ Salvo que el usuario lo solicite explícitamente, no modificar:
 - `config/routes.rb`
 - `db/`
 - autenticación, sesiones o autorización
-- esquema o contenido de PostgreSQL
 
 Las pantallas y comportamientos nuevos deben vivir en `app/javascript/` y utilizar datos mock de TypeScript.
 
@@ -69,7 +67,7 @@ Evitar:
 - Llamadas HTTP ficticias a endpoints que no existen.
 - Datos de menús o pedidos dentro de controladores Rails.
 - Migraciones para funcionalidades del prototipo.
-- Guardar el estado del dominio en PostgreSQL.
+- Agregar una base de datos o persistir el estado del dominio.
 - Duplicar arrays mock en varias pantallas.
 
 Por defecto, los cambios realizados por el usuario en la interfaz se mantienen solamente en estado React y se reinician al recargar. Agregar `localStorage` únicamente si el usuario lo pide.
@@ -103,7 +101,7 @@ El inicio de sesión también fue adaptado al lenguaje visual del producto:
 - Dos paneles del mismo ancho y alto desde `960px`.
 - Accesos rápidos visibles para las cuentas demo de empleado, administrador y proveedor.
 - El perfil demo seleccionado queda resaltado y completa las credenciales.
-- El acceso simulado con Google usa una marca multicolor y texto neutral respecto al rol.
+- El botón visual de Google usa una marca multicolor y texto neutral respecto al rol, pero no inicia sesión ni ejecuta ninguna acción en esta etapa.
 - Los campos muestran borde y sombra al pasar el puntero, cursor de texto y caret oscuro explícitos.
 - No mostrar en la interfaz referencias a Rails, PostgreSQL u otros detalles internos.
 
@@ -220,13 +218,11 @@ Abrir:
 http://localhost:3000
 ```
 
-Para detener sin borrar la base local:
+Para detener el servicio:
 
 ```powershell
 docker compose down
 ```
-
-No ejecutar `docker compose down -v` salvo que el usuario pida explícitamente borrar los volúmenes y los datos locales.
 
 Docker ya tiene configurado polling para detectar cambios desde Windows y carpetas sincronizadas con OneDrive.
 
@@ -246,7 +242,7 @@ Estos accesos deben permanecer visibles mientras el repositorio siga siendo un
 prototipo compartido. Pueden presentarse de manera integrada con el diseño final,
 pero no deben ocultarse o eliminarse sin una solicitud explícita.
 
-PostgreSQL se utiliza actualmente para estas cuentas, la autenticación y las pruebas relacionadas. Los datos de viandas siguen siendo mocks frontend.
+Las cuentas se validan mediante `DemoAccount`, un objeto Ruby en memoria. La sesión firmada conserva el correo seleccionado, pero no existe persistencia de usuarios ni se necesita `DATABASE_URL`.
 
 ## Verificación obligatoria
 
@@ -259,7 +255,7 @@ docker compose exec -T web npm run check
 También ejecutar las pruebas existentes para comprobar que la integración general continúa funcionando:
 
 ```powershell
-docker compose exec -T -e RAILS_ENV=test -e DATABASE_URL=postgresql://postgres:postgres@db/gogrow_react_prototype_test web bin/rails test
+docker compose exec -T -e RAILS_ENV=test web bin/rails test
 ```
 
 Para cambios visuales:

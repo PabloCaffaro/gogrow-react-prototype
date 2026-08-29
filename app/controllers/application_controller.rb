@@ -8,7 +8,10 @@ class ApplicationController < ActionController::Base
   private
 
   def current_user
-    @current_user ||= User.find_by(id: session[:user_id] || cookies.signed[:remembered_user_id])
+    # La sesión sólo conserva el correo de una cuenta demo. La identidad se
+    # reconstruye desde código y nunca se consulta una base de datos.
+    email = session[:demo_email] || cookies.signed[:remembered_demo_email]
+    @current_user ||= DemoAccount.find(email)
   end
 
   def require_authentication

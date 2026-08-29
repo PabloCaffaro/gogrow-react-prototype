@@ -46,7 +46,7 @@ export const orderHistory: EmployeeOrder[] = [
 
 /**
  * Deudas ficticias por proveedor.
- * La simulación de comprobantes modifica estado React, nunca este arreglo ni PostgreSQL.
+ * La simulación de comprobantes modifica estado React y nunca este arreglo original.
  */
 export const providerPayments: ProviderPayment[] = [
   {
