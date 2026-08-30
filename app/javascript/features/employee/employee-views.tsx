@@ -103,6 +103,7 @@ export function DishDetailView({
         onBack={onBack}
       />
 
+      {/* Contenido editable a la izquierda y resumen/acciones a la derecha en escritorio. */}
       <div className={styles.detailGrid}>
         <div className={styles.detailMain}>
           <div className={styles.foodHero}>
@@ -207,6 +208,7 @@ export function DishDetailView({
         </aside>
       </div>
 
+      {/* En teléfono esta barra sustituye la acción lateral del escritorio. */}
       <div className={styles.mobileActionBar}>
         <div><span>Total</span><strong>${total}</strong></div>
         <Button onClick={onReview}>Revisar pedido</Button>
@@ -252,6 +254,7 @@ export function CheckoutView({
         onBack={onBack}
       />
 
+      {/* Revisión visual: no crea el pedido hasta ejecutar `onConfirm`. */}
       <div className={styles.checkoutGrid}>
         <div className={styles.checkoutContent}>
           <Card className={styles.orderSummaryCard}>
@@ -427,6 +430,7 @@ export function PaymentsView() {
         <span><ReceiptText aria-hidden="true" /></span>
       </section>
 
+      {/* Cada tarjeta cambia a “Pendiente de validación” sólo durante esta sesión. */}
       <div className={styles.paymentGrid}>
         {providerPayments.map((payment) => {
           const receiptSent = sentPayments.includes(payment.id) || payment.status === 'pending-validation'

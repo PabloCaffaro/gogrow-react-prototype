@@ -180,6 +180,7 @@ export function EmployeeDashboard({ email }: Props) {
   /** Portada semanal; se extrae para mantener legible el selector de vistas final. */
   const renderMenu = () => (
     <>
+      {/* El encabezado amplio se reemplaza por una introducción compacta en móvil. */}
       <header className={styles.desktopHeader}>
         <div>
           <p className={styles.eyebrow}>{employeePrototype.dateLabel}</p>
@@ -205,6 +206,7 @@ export function EmployeeDashboard({ email }: Props) {
         <BenefitCard />
       </div>
 
+      {/* En móvil se apila; en escritorio agrega una columna lateral de resumen. */}
       <div className={styles.contentGrid}>
         <section className={styles.menuSection} aria-labelledby="weekly-menu-title">
           <div className={styles.sectionHeading}>
@@ -215,6 +217,7 @@ export function EmployeeDashboard({ email }: Props) {
             <span className={styles.desktopOnly}>Semana del 10 al 14</span>
           </div>
 
+          {/* Cambiar de día recalcula los platos visibles y limpia la selección anterior. */}
           <div className={styles.daySelector} aria-label="Elegir día">
             {menuDays.map((day) => (
               <Button
@@ -245,6 +248,7 @@ export function EmployeeDashboard({ email }: Props) {
             ))}
           </div>
 
+          {/* El listado contiene tarjetas visuales o un estado vacío según los mocks. */}
           <div className={styles.menuList} aria-live="polite">
             {visibleDishes.length > 0 ? visibleDishes.map((dish) => {
               const isSelected = selectedDishId === dish.id
@@ -313,6 +317,7 @@ export function EmployeeDashboard({ email }: Props) {
         </aside>
       </div>
 
+      {/* Acción fija exclusiva de móvil cuando ya existe una vianda seleccionada. */}
       {selectedDish && (
         <div className={styles.mobileSelection} role="status">
           <div>
@@ -325,6 +330,7 @@ export function EmployeeDashboard({ email }: Props) {
     </>
   )
 
+  // Shell general: barra lateral en escritorio, contenido y navegación inferior móvil.
   return (
     <div className={styles.page}>
       <aside className={styles.desktopSidebar}>

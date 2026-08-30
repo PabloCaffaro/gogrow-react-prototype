@@ -37,9 +37,12 @@ import styles from './admin-dashboard.module.css'
 
 type Props = { email: string }
 type Icon = typeof Home
+
+/** Filtros y pestañas válidos; los tipos impiden navegar a estados inexistentes. */
 type EmployeeFilter = 'all' | 'temporary' | 'custom' | 'debt' | 'near-limit' | 'no-orders'
 type EmployeeDetailTab = 'summary' | 'orders' | 'balances' | 'benefit'
 
+/** Configuración visual compartida por la barra lateral y la navegación móvil. */
 const navigation: Record<AdminSection, { label: string; icon: Icon }> = {
   home: { label: 'Inicio', icon: Home },
   employees: { label: 'Empleados', icon: Users },
@@ -71,6 +74,7 @@ const detailTabs: Array<[EmployeeDetailTab, string]> = [
   ['benefit', 'Configuración'],
 ]
 
+/** Componente exclusivamente visual para mantener iguales los encabezados del panel. */
 function Header({ eyebrow, title, description, children }: {
   eyebrow: string
   title: string
@@ -80,10 +84,12 @@ function Header({ eyebrow, title, description, children }: {
   return <header className={styles.header}><div><p>{eyebrow}</p><h1>{title}</h1>{description && <span>{description}</span>}</div>{children}</header>
 }
 
+/** Tarjeta visual reutilizable; no calcula datos ni modifica estado. */
 function Stat({ label, value, note }: { label: string; value: string; note: string }) {
   return <Card className={styles.stat} size="sm"><CardHeader><CardDescription>{label}</CardDescription></CardHeader><CardContent><strong>{value}</strong><small>{note}</small></CardContent></Card>
 }
 
+/** Dato derivado: suma los saldos mock sin guardarlos nuevamente en estado. */
 function totalDebt(employee: AdminEmployee) {
   return employee.balances.reduce((total, balance) => total + balance.debt, 0)
 }
@@ -97,14 +103,19 @@ function effectiveBenefit(employee: AdminEmployee) {
 }
 
 export function AdminDashboard({ email }: Props) {
+  // Estado de navegación: sección principal, empleado abierto y pestaña de su ficha.
   const [section, setSection] = useState<AdminSection>('home')
   const [employees, setEmployees] = useState(adminEmployees)
   const [employeeFilter, setEmployeeFilter] = useState<EmployeeFilter>('all')
   const [employeeSearch, setEmployeeSearch] = useState('')
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null)
   const [detailTab, setDetailTab] = useState<EmployeeDetailTab>('summary')
+
+  // Preferencias y mensajes puramente locales del prototipo.
   const [notifications, setNotifications] = useState(true)
   const [toast, setToast] = useState<string | null>(null)
+
+  // Borrador de los dos formularios de beneficio del empleado seleccionado.
   const [baseAllowance, setBaseAllowance] = useState('20')
   const [baseContribution, setBaseContribution] = useState('50')
   const [temporaryAllowance, setTemporaryAllowance] = useState('20')
@@ -113,8 +124,10 @@ export function AdminDashboard({ email }: Props) {
   const [temporaryEnd, setTemporaryEnd] = useState('2026-06-29')
   const [temporaryReason, setTemporaryReason] = useState('')
 
+  // El objeto seleccionado se deriva del id para conservar una sola fuente de verdad.
   const selectedEmployee = employees.find((employee) => employee.id === selectedEmployeeId)
 
+  /** Aplica búsqueda y filtros sobre los empleados en memoria; no consulta al servidor. */
   const visibleEmployees = useMemo(() => {
     const query = employeeSearch.trim().toLocaleLowerCase('es')
     return employees.filter((employee) => {
@@ -129,12 +142,14 @@ export function AdminDashboard({ email }: Props) {
     })
   }, [employeeFilter, employeeSearch, employees])
 
+  /** Cambia de sección principal y cierra cualquier ficha de empleado abierta. */
   const navigate = (nextSection: AdminSection) => {
     setSection(nextSection)
     setSelectedEmployeeId(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  /** Muestra una confirmación temporal para las acciones simuladas. */
   const announce = (message: string) => {
     setToast(message)
     window.setTimeout(() => setToast(null), 2200)
@@ -146,6 +161,7 @@ export function AdminDashboard({ email }: Props) {
     event.currentTarget.setSelectionRange(caretPosition, caretPosition)
   }
 
+  /** Abre la ficha y copia la configuración vigente a los campos editables. */
   const openEmployee = (employee: AdminEmployee) => {
     setSelectedEmployeeId(employee.id)
     setDetailTab('summary')
@@ -159,6 +175,7 @@ export function AdminDashboard({ email }: Props) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  /** Actualiza sólo el estado React; al recargar se restauran los mocks originales. */
   const savePermanentBenefit = () => {
     if (!selectedEmployee) return
     setEmployees((current) => current.map((employee) => employee.id === selectedEmployee.id
@@ -167,6 +184,7 @@ export function AdminDashboard({ email }: Props) {
     announce('Beneficio permanente actualizado')
   }
 
+  /** Crea o reemplaza la excepción temporal del empleado seleccionado. */
   const saveTemporaryBenefit = () => {
     if (!selectedEmployee) return
     const temporaryBenefit: TemporaryBenefit = {
@@ -182,6 +200,7 @@ export function AdminDashboard({ email }: Props) {
     announce('Beneficio temporal guardado')
   }
 
+  /** Elimina la excepción para volver a mostrar el beneficio permanente. */
   const removeTemporaryBenefit = () => {
     if (!selectedEmployee) return
     setEmployees((current) => current.map((employee) => {
@@ -192,6 +211,7 @@ export function AdminDashboard({ email }: Props) {
     announce('Beneficio temporal finalizado')
   }
 
+  // Vista visual de inicio: indicadores generales y accesos a otras secciones.
   const home = (
     <>
       <Header eyebrow="Lunes, 26 de mayo" title={`Hola, ${adminProfile.name} 👋`}><Button variant="outline" size="icon" onClick={() => navigate('account')} aria-label="Configuración"><Settings2 /></Button></Header>
@@ -204,6 +224,7 @@ export function AdminDashboard({ email }: Props) {
     </>
   )
 
+  // Vista de listado: buscador, filtros y acceso al detalle de cada empleado.
   const employeeList = (
     <>
       <Header eyebrow="Gestión de personas" title="Empleados" description="Cada persona tiene 20 viandas mensuales y puede contar con una configuración individual."><Button size="lg" onClick={() => announce('Formulario de alta listo para la próxima etapa')}><Plus /> Agregar</Button></Header>
@@ -217,6 +238,7 @@ export function AdminDashboard({ email }: Props) {
     </>
   )
 
+  // Vista de detalle: calcula métricas del empleado y renderiza la pestaña activa.
   const employeeDetail = selectedEmployee && (() => {
     const benefit = effectiveBenefit(selectedEmployee)
     const debt = totalDebt(selectedEmployee)
@@ -259,14 +281,17 @@ export function AdminDashboard({ email }: Props) {
     </>
   })()
 
+  // La sección Empleados alterna entre listado y ficha sin crear una ruta nueva.
   const employeesView = selectedEmployee ? employeeDetail : employeeList
 
+  // Las siguientes constantes son vistas presentacionales de cada sección principal.
   const payments = <><Header eyebrow="Control de aportes" title="Liquidaciones" description="Validá cuánto corresponde aportar a la empresa por cada proveedor y período." /><section className={styles.paymentSummary}><Stat label="Por revisar" value="$42.840" note="1 liquidación" /><Stat label="Validadas" value="$56.320" note="Listas para gestión externa" /><Stat label="Pagadas en mayo" value="$96.410" note="Confirmadas con comprobante" /></section><section className={styles.paymentList} aria-label="Liquidaciones por proveedor">{adminPayments.map((payment) => <Card className={styles.payment} size="sm" key={payment.id}><span className={styles.paymentIcon}><CircleDollarSign /></span><div><small>{payment.id} · {payment.period}</small><h2>{payment.provider}</h2><p>{payment.orders} pedidos · Total ${payment.grossAmount.toLocaleString('es-UY')}</p></div><strong>${payment.amount.toLocaleString('es-UY')}</strong><Badge variant="outline" data-status={payment.status}>{paymentLabels[payment.status]}</Badge><div className={styles.paymentBreakdown}><span>Empleados: ${payment.employeeShare.toLocaleString('es-UY')}</span>{payment.adjustment && <span>Ajuste: ${payment.adjustment}</span>}</div><Button variant="ghost" size="sm" onClick={() => announce(`Detalle de ${payment.id}`)}>Ver detalle</Button></Card>)}</section></>
 
   const insights = <><Header eyebrow="Últimos 30 días" title="Métricas" description="Una lectura del uso del beneficio mensual en la organización." /><section className={styles.stats}><Stat label="Pedidos" value="1.248" note="+9% frente a abril" /><Stat label="Usuarios frecuentes" value="92" note="72% de los empleados" /><Stat label="Ticket promedio" value="$318" note="Empresa aporta $159" /><Stat label="Uso del beneficio" value="81%" note="Promedio mensual" /></section><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Tendencia mensual</p><h2>Pedidos por semana</h2></div></div><p className={styles.chartHelp}>La división semanal permite observar el ritmo de consumo, pero el beneficio se contabiliza sobre el total mensual.</p><div className={styles.chart}>{[58, 72, 66, 88].map((height, index) => <div key={height}><span style={{ height: `${height}%` }} /><small>Semana {index + 1}</small></div>)}</div></section></>
 
   const account = <><Header eyebrow="Preferencias" title="Mi cuenta" description="Administrá tus datos y las notificaciones del panel." /><div className={styles.accountGrid}><section className={styles.profile}><span className={styles.bigAvatar}>{adminProfile.initials}</span><div><h2>{adminProfile.fullName}</h2><p>Administradora · {adminProfile.company}</p><small>{email}</small></div></section><section className={styles.surface}><div className={styles.setting}><Bell /><span><strong>Resumen semanal</strong><small>Actividad, consumos y liquidaciones.</small></span><button type="button" className={styles.switch} role="switch" aria-checked={notifications} data-enabled={notifications} onClick={() => setNotifications((value) => !value)}><i /></button></div><button type="button" className={styles.accountLink} onClick={() => router.delete('/logout')}><LogOut /> Cerrar sesión <ChevronRight /></button></section></div></>
 
+  // Mapa de navegación: evita condicionales repetidos al elegir la vista principal.
   const views: Record<AdminSection, React.ReactNode> = { home, employees: employeesView, payments, insights, account }
 
   return <><Head title="Panel de Administrador" /><div className={styles.page}><aside className={styles.sidebar}><button className={styles.brand} type="button" onClick={() => navigate('home')} aria-label="Ir al inicio principal del administrador"><span><ShieldCheck /></span><strong>GoGrow</strong><small>Administrador</small></button><nav aria-label="Navegación principal del administrador">{(Object.entries(navigation) as Array<[AdminSection, { label: string; icon: Icon }]>).map(([key, item]) => <button type="button" key={key} data-active={section === key} onClick={() => navigate(key)}><item.icon /><span>{item.label}</span></button>)}</nav><div className={styles.sidebarUser}><span className={styles.avatar}>{adminProfile.initials}</span><div><strong>{adminProfile.fullName}</strong><small>{email}</small></div></div></aside><main className={styles.workspace}>{views[section]}</main><nav className={styles.mobileNav} aria-label="Navegación móvil del administrador">{(Object.entries(navigation) as Array<[AdminSection, { label: string; icon: Icon }]>).map(([key, item]) => <button type="button" key={key} data-active={section === key} onClick={() => navigate(key)}><item.icon /><span>{item.label}</span></button>)}</nav>{toast && <div className={styles.toast} role="status"><Check />{toast}</div>}</div></>

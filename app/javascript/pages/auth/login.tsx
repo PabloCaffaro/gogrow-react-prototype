@@ -66,6 +66,7 @@ export default function Login() {
       <Head title="Iniciar sesión" />
       <main className={styles.page}>
         <div className={styles.layout}>
+          {/* Panel editorial: explica el producto y sólo aparece en pantallas amplias. */}
           <section className={styles.introduction} aria-labelledby="product-title">
             <div className={styles.brand}>
               <span className={styles.brandMark}><UtensilsCrossed aria-hidden="true" /></span>
@@ -90,6 +91,7 @@ export default function Login() {
             <p className={styles.introductionFooter}>Alimentación que acompaña tu jornada.</p>
           </section>
 
+          {/* Panel funcional: contiene marca móvil, formulario y accesos demo. */}
           <section className={styles.accessSection}>
             <div className={styles.mobileBrand}>
               <span className={styles.brandMark}><UtensilsCrossed aria-hidden="true" /></span>
@@ -117,6 +119,7 @@ export default function Login() {
 
                 <div className={styles.loginDivider}><Separator /><span>o ingresá con tu email</span><Separator /></div>
 
+                {/* Inertia envía estos campos a Rails y devuelve los errores en `errors`. */}
                 <form className={styles.form} onSubmit={submit} noValidate>
                   {errors.email && (
                     <Alert variant="destructive" role="alert">
@@ -188,6 +191,7 @@ export default function Login() {
                   </Button>
                 </form>
 
+                {/* Estos accesos completan credenciales; el rol se valida luego en Rails. */}
                 <div className={styles.demoDivider}>
                   <Separator className={styles.dividerLine} />
                   <span className={styles.dividerLabel}>Acceso rápido de demostración</span>
