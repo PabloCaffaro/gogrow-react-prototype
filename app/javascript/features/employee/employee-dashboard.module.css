@@ -80,6 +80,9 @@
   background: #f5f5f4;
 }
 
+/* Card aporta la superficie; el contenido conserva la densidad del diseño móvil. */
+.benefitCard > [data-slot='card-content'] { padding: 0; }
+
 .benefitHeader {
   display: flex;
   align-items: center;
@@ -240,6 +243,9 @@
   background: #ffffff;
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
+
+.dishCard,
+.selectionCard { box-shadow: 0 6px 20px rgb(20 20 18 / 5%), 0 0 0 1px #e3e3e0; }
 
 .dishCard[data-selected='true'] {
   border-color: #242424;

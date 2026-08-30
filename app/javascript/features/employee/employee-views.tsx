@@ -27,6 +27,11 @@ import {
 
 import type { DeliveryLocation, EmployeeOrder } from '@/domain/employee'
 import type { Dish } from '@/domain/menu'
+import { Button } from '@/components/ui/actions/button'
+import { Badge } from '@/components/ui/data-display/badge'
+import { Card } from '@/components/ui/data-display/card'
+import { Label } from '@/components/ui/forms/label'
+import { Textarea } from '@/components/ui/forms/textarea'
 import { orderHistory, providerPayments, upcomingOrders } from '@/mocks/employee-sections'
 import styles from './employee-views.module.css'
 
@@ -42,9 +47,9 @@ function ScreenHeader({ eyebrow, title, description, onBack }: ScreenHeaderProps
   return (
     <header className={styles.screenHeader}>
       {onBack && (
-        <button className={styles.backButton} type="button" onClick={onBack} aria-label="Volver">
+        <Button className={styles.backButton} variant="outline" size="icon" onClick={onBack} aria-label="Volver">
           <ArrowLeft aria-hidden="true" />
-        </button>
+        </Button>
       )}
       <div>
         <p>{eyebrow}</p>
@@ -109,10 +114,10 @@ export function DishDetailView({
             </div>
           </div>
 
-          <div className={styles.surface}>
+          <Card className={styles.surface}>
             <h3>Sobre este plato</h3>
             <p className={styles.bodyText}>{dish.details ?? dish.description}</p>
-          </div>
+          </Card>
 
           {dish.customizations && (
             <fieldset className={styles.surface}>
@@ -134,9 +139,9 @@ export function DishDetailView({
             </fieldset>
           )}
 
-          <div className={styles.surface}>
-            <label className={styles.fieldLabel} htmlFor="order-notes">Aclaraciones</label>
-            <textarea
+          <Card className={styles.surface}>
+            <Label className={styles.fieldLabel} htmlFor="order-notes">Aclaraciones</Label>
+            <Textarea
               id="order-notes"
               value={notes}
               maxLength={180}
@@ -144,7 +149,7 @@ export function DishDetailView({
               onChange={(event) => onNotesChange(event.target.value)}
             />
             <span className={styles.characterCount}>{notes.length}/180</span>
-          </div>
+          </Card>
         </div>
 
         <aside className={styles.orderPanel}>
@@ -197,14 +202,14 @@ export function DishDetailView({
 
           <div className={styles.desktopActionCard}>
             <div><span>Total con beneficio</span><strong>${total}</strong></div>
-            <button type="button" onClick={onReview}>Revisar pedido</button>
+            <Button onClick={onReview}>Revisar pedido</Button>
           </div>
         </aside>
       </div>
 
       <div className={styles.mobileActionBar}>
         <div><span>Total</span><strong>${total}</strong></div>
-        <button type="button" onClick={onReview}>Revisar pedido</button>
+        <Button onClick={onReview}>Revisar pedido</Button>
       </div>
     </section>
   )
@@ -249,7 +254,7 @@ export function CheckoutView({
 
       <div className={styles.checkoutGrid}>
         <div className={styles.checkoutContent}>
-          <article className={styles.orderSummaryCard}>
+          <Card className={styles.orderSummaryCard}>
             <span className={styles.foodIcon}><UtensilsCrossed aria-hidden="true" /></span>
             <div>
               <p>{dish.providerName}</p>
@@ -257,7 +262,7 @@ export function CheckoutView({
               <span>{quantity} unidad{quantity > 1 ? 'es' : ''} · {customization}</span>
             </div>
             <strong>${total}</strong>
-          </article>
+          </Card>
 
           <div className={styles.surface}>
             <h3>Entrega</h3>
@@ -283,14 +288,14 @@ export function CheckoutView({
           <div><span>Precio de lista</span><span>${subtotal}</span></div>
           <div className={styles.benefitLine}><span>Beneficio GoGrow</span><span>-${benefit}</span></div>
           <div className={styles.totalLine}><strong>Total a pagar</strong><strong>${total}</strong></div>
-          <button type="button" onClick={onConfirm}>Confirmar pedido</button>
+          <Button onClick={onConfirm}>Confirmar pedido</Button>
           <p>El importe se acumulará en tu estado de cuenta mensual.</p>
         </aside>
       </div>
 
       <div className={styles.mobileActionBar}>
         <div><span>Total a pagar</span><strong>${total}</strong></div>
-        <button type="button" onClick={onConfirm}>Confirmar</button>
+        <Button onClick={onConfirm}>Confirmar</Button>
       </div>
     </section>
   )
@@ -313,7 +318,7 @@ export function OrderSuccessView({ dish, quantity, delivery, onOrders, onMenu }:
       <h1>¡Tu vianda ya está reservada!</h1>
       <span>El proveedor recibió tu pedido y te avisaremos si hay algún cambio.</span>
 
-      <article className={styles.successCard}>
+      <Card className={styles.successCard}>
         <div><span>Plato</span><strong>{dish.name}</strong></div>
         <div><span>Proveedor</span><strong>{dish.providerName}</strong></div>
         <div><span>Cantidad</span><strong>{quantity}</strong></div>
@@ -321,11 +326,11 @@ export function OrderSuccessView({ dish, quantity, delivery, onOrders, onMenu }:
           <span>Entrega</span>
           <strong>{delivery === 'office' ? 'Oficina GoGrow' : 'Tu domicilio'} · Lunes 10, 12:30</strong>
         </div>
-      </article>
+      </Card>
 
       <div className={styles.successActions}>
-        <button type="button" onClick={onOrders}>Ver mis pedidos</button>
-        <button type="button" onClick={onMenu}>Volver al menú</button>
+        <Button onClick={onOrders}>Ver mis pedidos</Button>
+        <Button variant="outline" onClick={onMenu}>Volver al menú</Button>
       </div>
     </section>
   )
@@ -340,9 +345,9 @@ function OrderCard({ order }: { order: EmployeeOrder }) {
   } as const
 
   return (
-    <article className={styles.orderCard}>
+    <Card className={styles.orderCard}>
       <div className={styles.orderCardHeader}>
-        <span data-status={order.status}>{labels[order.status]}</span>
+        <Badge variant={order.status === 'confirmed' ? 'secondary' : 'outline'} data-status={order.status}>{labels[order.status]}</Badge>
         <small>{order.id}</small>
       </div>
       <h2>{order.dishName}</h2>
@@ -351,7 +356,7 @@ function OrderCard({ order }: { order: EmployeeOrder }) {
         <span><Clock3 aria-hidden="true" />{order.deliveryLabel}</span>
         <strong>${order.amount}</strong>
       </div>
-    </article>
+    </Card>
   )
 }
 
@@ -382,9 +387,9 @@ export function OrdersView({ onMenu }: { onMenu: () => void }) {
       </div>
 
       {tab === 'upcoming' && (
-        <button className={styles.secondaryCta} type="button" onClick={onMenu}>
+        <Button className={styles.secondaryCta} variant="outline" onClick={onMenu}>
           <UtensilsCrossed aria-hidden="true" /> Pedir otra vianda
-        </button>
+        </Button>
       )}
     </section>
   )
@@ -427,7 +432,7 @@ export function PaymentsView() {
           const receiptSent = sentPayments.includes(payment.id) || payment.status === 'pending-validation'
 
           return (
-            <article className={styles.paymentCard} key={payment.id}>
+            <Card className={styles.paymentCard} key={payment.id}>
               <div className={styles.paymentTopline}>
                 <div>
                   <p>{payment.period}</p>
@@ -440,12 +445,12 @@ export function PaymentsView() {
                 <span><small>Cuenta para transferir</small><strong>{payment.accountNumber}</strong></span>
               </div>
               <div className={styles.paymentFooter}>
-                <span data-sent={receiptSent}>{receiptSent ? 'Pendiente de validación' : payment.dueLabel}</span>
-                <button type="button" disabled={receiptSent} onClick={() => sendReceipt(payment.id)}>
+                <Badge variant={receiptSent ? 'secondary' : 'outline'} data-sent={receiptSent}>{receiptSent ? 'Pendiente de validación' : payment.dueLabel}</Badge>
+                <Button variant="outline" size="sm" disabled={receiptSent} onClick={() => sendReceipt(payment.id)}>
                   {receiptSent ? <><FileCheck2 aria-hidden="true" /> Enviado</> : 'Simular comprobante'}
-                </button>
+                </Button>
               </div>
-            </article>
+            </Card>
           )
         })}
       </div>

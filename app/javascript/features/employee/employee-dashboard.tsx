@@ -16,6 +16,9 @@ import {
 
 import type { DeliveryLocation, EmployeeView, PrimaryEmployeeSection } from '@/domain/employee'
 import type { ProviderId } from '@/domain/menu'
+import { Button } from '@/components/ui/actions/button'
+import { Badge } from '@/components/ui/data-display/badge'
+import { Card, CardContent } from '@/components/ui/data-display/card'
 import { dishes, employeePrototype, menuDays } from '@/mocks/employee-home'
 import {
   AccountView,
@@ -57,10 +60,11 @@ function BenefitCard() {
   const progress = `${Math.round((usedThisMonth / monthlyLimit) * 100)}%`
 
   return (
-    <section className={styles.benefitCard} aria-labelledby="benefit-title">
+    <Card className={styles.benefitCard} aria-labelledby="benefit-title">
+      <CardContent>
       <div className={styles.benefitHeader}>
         <p id="benefit-title">Tu beneficio</p>
-        <span>Este mes</span>
+        <Badge variant="secondary">Este mes</Badge>
       </div>
       <p className={styles.benefitValue}>
         {usedThisMonth} de {monthlyLimit} viandas pedidas
@@ -76,7 +80,8 @@ function BenefitCard() {
       >
         <span style={{ width: progress }} />
       </div>
-    </section>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -180,14 +185,15 @@ export function EmployeeDashboard({ email }: Props) {
           <p className={styles.eyebrow}>{employeePrototype.dateLabel}</p>
           <h1>Hola, {employeePrototype.name} <span aria-hidden="true">👋</span></h1>
         </div>
-        <button
+        <Button
           className={styles.settingsButton}
-          type="button"
+          variant="outline"
+          size="icon"
           aria-label="Configuración"
           onClick={() => navigate('account')}
         >
           <Settings2 aria-hidden="true" />
-        </button>
+        </Button>
       </header>
 
       <div className={styles.mobileIntro}>
@@ -211,30 +217,31 @@ export function EmployeeDashboard({ email }: Props) {
 
           <div className={styles.daySelector} aria-label="Elegir día">
             {menuDays.map((day) => (
-              <button
+              <Button
                 key={day.id}
-                type="button"
+                variant={selectedDay === day.id ? 'default' : 'outline'}
                 data-selected={selectedDay === day.id}
                 onClick={() => chooseDay(day.id)}
                 aria-pressed={selectedDay === day.id}
               >
                 <span>{day.shortName}</span>
                 <strong>{day.date}</strong>
-              </button>
+              </Button>
             ))}
           </div>
 
           <div className={styles.providerSelector} aria-label="Filtrar por proveedor">
             {providerFilters.map((provider) => (
-              <button
+              <Button
                 key={provider.id}
-                type="button"
+                size="sm"
+                variant={providerFilter === provider.id ? 'default' : 'ghost'}
                 data-selected={providerFilter === provider.id}
                 onClick={() => setProviderFilter(provider.id)}
                 aria-pressed={providerFilter === provider.id}
               >
                 {provider.label}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -243,22 +250,23 @@ export function EmployeeDashboard({ email }: Props) {
               const isSelected = selectedDishId === dish.id
 
               return (
-                <article className={styles.dishCard} key={dish.id} data-selected={isSelected}>
+                <Card className={styles.dishCard} size="sm" key={dish.id} data-selected={isSelected}>
                   <div>
                     <p className={styles.providerName}>{dish.providerName}</p>
                     <h3>{dish.name} <span aria-hidden="true">|</span> ${dish.price}</h3>
                     <p className={styles.dishDescription}>{dish.description}</p>
                   </div>
-                  <button
-                    type="button"
+                  <Button
                     className={styles.addButton}
+                    variant={isSelected ? 'default' : 'outline'}
+                    size="icon"
                     data-selected={isSelected}
                     onClick={() => toggleDish(dish.id)}
                     aria-label={isSelected ? `Quitar ${dish.name}` : `Agregar ${dish.name}`}
                   >
                     {isSelected ? <Check aria-hidden="true" /> : <Plus aria-hidden="true" />}
-                  </button>
-                </article>
+                  </Button>
+                </Card>
               )
               }) : (
                 <div className={styles.emptyState}>
@@ -281,7 +289,7 @@ export function EmployeeDashboard({ email }: Props) {
         <aside className={styles.desktopSummary} aria-label="Resumen de la semana">
           <BenefitCard />
 
-          <section className={styles.selectionCard}>
+          <Card className={styles.selectionCard}>
             <p className={styles.selectionLabel}>Tu selección</p>
             {selectedDish ? (
               <>
@@ -291,9 +299,9 @@ export function EmployeeDashboard({ email }: Props) {
                   <span>Precio con beneficio</span>
                   <strong>${selectedDish.price}</strong>
                 </div>
-                <button className={styles.continueButton} type="button" onClick={startOrder}>
+                <Button className={styles.continueButton} onClick={startOrder}>
                   Continuar pedido
-                </button>
+                </Button>
               </>
             ) : (
               <div className={styles.noSelection}>
@@ -301,7 +309,7 @@ export function EmployeeDashboard({ email }: Props) {
                 <p>Elegí un plato para comenzar tu pedido.</p>
               </div>
             )}
-          </section>
+          </Card>
         </aside>
       </div>
 
@@ -311,7 +319,7 @@ export function EmployeeDashboard({ email }: Props) {
             <span>Seleccionaste</span>
             <strong>{selectedDish.name}</strong>
           </div>
-          <button type="button" onClick={startOrder}>Continuar</button>
+          <Button onClick={startOrder}>Continuar</Button>
         </div>
       )}
     </>
