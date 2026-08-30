@@ -44,7 +44,8 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN bundle exec bootsnap precompile app/ lib/
+RUN chmod +x bin/* && \
+    bundle exec bootsnap precompile app/ lib/
 
 # La clave ficticia sirve solamente para compilar recursos. En ejecución Rails
 # recibe SECRET_KEY_BASE desde las variables sensibles configuradas en Vercel.

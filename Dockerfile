@@ -64,7 +64,8 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN bundle exec bootsnap precompile app/ lib/
+RUN chmod +x bin/* && \
+    bundle exec bootsnap precompile app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 # Imagen final de producción.
