@@ -9,17 +9,13 @@ import {
   ArrowLeft,
   Bell,
   Check,
-  CheckCircle2,
   ChevronRight,
   Clock3,
-  CreditCard,
-  FileCheck2,
   Home,
   LogOut,
   MapPin,
   Minus,
   Plus,
-  ReceiptText,
   ShieldCheck,
   UserRound,
   UtensilsCrossed,
@@ -30,9 +26,10 @@ import type { Dish } from '@/domain/menu'
 import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
 import { Card } from '@/components/ui/data-display/card'
+import { Input } from '@/components/ui/forms/input'
 import { Label } from '@/components/ui/forms/label'
 import { Textarea } from '@/components/ui/forms/textarea'
-import { orderHistory, providerPayments, upcomingOrders } from '@/mocks/employee-sections'
+import { orderHistory, upcomingOrders } from '@/mocks/employee-sections'
 import styles from './employee-views.module.css'
 
 type ScreenHeaderProps = {
@@ -71,11 +68,12 @@ type DetailProps = {
   onCustomizationChange: (customization: string) => void
   onNotesChange: (notes: string) => void
   onDeliveryChange: (delivery: DeliveryLocation) => void
-  onReview: () => void
+  onAddToCart: () => void
+  maxQuantity: number
 }
 
 /**
- * Permite personalizar una vianda antes del checkout.
+ * Permite personalizar una vianda antes de agregarla al carrito.
  * No confirma ni persiste: comunica cada cambio al estado mantenido por el dashboard.
  */
 export function DishDetailView({
@@ -89,7 +87,8 @@ export function DishDetailView({
   onCustomizationChange,
   onNotesChange,
   onDeliveryChange,
-  onReview,
+  onAddToCart,
+  maxQuantity,
 }: DetailProps) {
   // En el prototipo `price` ya representa el precio unitario con beneficio.
   const total = dish.price * quantity
@@ -125,7 +124,7 @@ export function DishDetailView({
               <legend>Elegí una opción</legend>
               <div className={styles.choiceList}>
                 {dish.customizations.map((option) => (
-                  <button
+                  <Button variant="outline"
                     key={option}
                     type="button"
                     data-selected={customization === option}
@@ -134,7 +133,7 @@ export function DishDetailView({
                   >
                     <span>{option}</span>
                     {customization === option && <Check aria-hidden="true" />}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </fieldset>
@@ -155,32 +154,32 @@ export function DishDetailView({
 
         <aside className={styles.orderPanel}>
           <div className={styles.surface}>
-            <h3>Cantidad</h3>
+            <h3>Cantidad</h3><p className={styles.bodyText}>Máximo 20 por plato entre todas sus variantes. Podés agregar {maxQuantity} más.</p>
             <div className={styles.quantityControl}>
-              <button
+              <Button variant="outline"
                 type="button"
                 onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
                 disabled={quantity === 1}
                 aria-label="Disminuir cantidad"
               >
                 <Minus aria-hidden="true" />
-              </button>
-              <strong aria-live="polite">{quantity}</strong>
-              <button
+              </Button>
+              <Input type="number" min={1} max={maxQuantity} value={quantity} aria-label="Cantidad del plato" onChange={event => { const value = Number(event.target.value); if (Number.isInteger(value) && value >= 1) onQuantityChange(Math.min(maxQuantity, value)) }} />
+              <Button variant="outline"
                 type="button"
-                onClick={() => onQuantityChange(Math.min(3, quantity + 1))}
-                disabled={quantity === 3}
+                onClick={() => onQuantityChange(Math.min(maxQuantity, quantity + 1))}
+                disabled={quantity >= maxQuantity}
                 aria-label="Aumentar cantidad"
               >
                 <Plus aria-hidden="true" />
-              </button>
+              </Button>
             </div>
           </div>
 
           <fieldset className={styles.surface}>
             <legend>Entrega</legend>
             <div className={styles.deliveryChoices}>
-              <button
+              <Button variant="outline"
                 type="button"
                 data-selected={delivery === 'office'}
                 aria-pressed={delivery === 'office'}
@@ -188,8 +187,8 @@ export function DishDetailView({
               >
                 <Home aria-hidden="true" />
                 <span><strong>Oficina</strong><small>18 de Julio 1006</small></span>
-              </button>
-              <button
+              </Button>
+              <Button variant="outline"
                 type="button"
                 data-selected={delivery === 'home'}
                 aria-pressed={delivery === 'home'}
@@ -197,13 +196,13 @@ export function DishDetailView({
               >
                 <MapPin aria-hidden="true" />
                 <span><strong>Domicilio</strong><small>Dirección guardada</small></span>
-              </button>
+              </Button>
             </div>
           </fieldset>
 
           <div className={styles.desktopActionCard}>
             <div><span>Total con beneficio</span><strong>${total}</strong></div>
-            <Button onClick={onReview}>Revisar pedido</Button>
+            <Button disabled={maxQuantity <= 0} onClick={onAddToCart}>Agregar al carrito</Button>
           </div>
         </aside>
       </div>
@@ -211,129 +210,7 @@ export function DishDetailView({
       {/* En teléfono esta barra sustituye la acción lateral del escritorio. */}
       <div className={styles.mobileActionBar}>
         <div><span>Total</span><strong>${total}</strong></div>
-        <Button onClick={onReview}>Revisar pedido</Button>
-      </div>
-    </section>
-  )
-}
-
-type CheckoutProps = {
-  dish: Dish
-  quantity: number
-  customization: string
-  notes: string
-  delivery: DeliveryLocation
-  onBack: () => void
-  onConfirm: () => void
-}
-
-/**
- * Paso de revisión final. Separa precio de lista, subsidio simulado y total a pagar
- * para validar cómo se comunica el beneficio al empleado.
- */
-export function CheckoutView({
-  dish,
-  quantity,
-  customization,
-  notes,
-  delivery,
-  onBack,
-  onConfirm,
-}: CheckoutProps) {
-  // Escenario temporal: el beneficio cubre el 50 % del precio de lista.
-  const subtotal = dish.price * quantity * 2
-  const benefit = dish.price * quantity
-  const total = dish.price * quantity
-
-  return (
-    <section className={styles.view}>
-      <ScreenHeader
-        eyebrow="Último paso"
-        title="Revisá tu pedido"
-        description="Confirmá que los datos estén correctos."
-        onBack={onBack}
-      />
-
-      {/* Revisión visual: no crea el pedido hasta ejecutar `onConfirm`. */}
-      <div className={styles.checkoutGrid}>
-        <div className={styles.checkoutContent}>
-          <Card className={styles.orderSummaryCard}>
-            <span className={styles.foodIcon}><UtensilsCrossed aria-hidden="true" /></span>
-            <div>
-              <p>{dish.providerName}</p>
-              <h2>{dish.name}</h2>
-              <span>{quantity} unidad{quantity > 1 ? 'es' : ''} · {customization}</span>
-            </div>
-            <strong>${total}</strong>
-          </Card>
-
-          <div className={styles.surface}>
-            <h3>Entrega</h3>
-            <div className={styles.informationRow}>
-              {delivery === 'office' ? <Home aria-hidden="true" /> : <MapPin aria-hidden="true" />}
-              <div>
-                <strong>{delivery === 'office' ? 'Oficina GoGrow' : 'Tu domicilio'}</strong>
-                <span>Lunes 10 · 12:30</span>
-              </div>
-            </div>
-          </div>
-
-          {notes && (
-            <div className={styles.surface}>
-              <h3>Aclaraciones</h3>
-              <p className={styles.bodyText}>{notes}</p>
-            </div>
-          )}
-        </div>
-
-        <aside className={styles.priceCard}>
-          <h2>Resumen</h2>
-          <div><span>Precio de lista</span><span>${subtotal}</span></div>
-          <div className={styles.benefitLine}><span>Beneficio GoGrow</span><span>-${benefit}</span></div>
-          <div className={styles.totalLine}><strong>Total a pagar</strong><strong>${total}</strong></div>
-          <Button onClick={onConfirm}>Confirmar pedido</Button>
-          <p>El importe se acumulará en tu estado de cuenta mensual.</p>
-        </aside>
-      </div>
-
-      <div className={styles.mobileActionBar}>
-        <div><span>Total a pagar</span><strong>${total}</strong></div>
-        <Button onClick={onConfirm}>Confirmar</Button>
-      </div>
-    </section>
-  )
-}
-
-type SuccessProps = {
-  dish: Dish
-  quantity: number
-  delivery: DeliveryLocation
-  onOrders: () => void
-  onMenu: () => void
-}
-
-/** Confirmación puramente visual que ofrece volver al menú o consultar pedidos. */
-export function OrderSuccessView({ dish, quantity, delivery, onOrders, onMenu }: SuccessProps) {
-  return (
-    <section className={`${styles.view} ${styles.successView}`}>
-      <div className={styles.successIcon}><CheckCircle2 aria-hidden="true" /></div>
-      <p>Pedido confirmado</p>
-      <h1>¡Tu vianda ya está reservada!</h1>
-      <span>El proveedor recibió tu pedido y te avisaremos si hay algún cambio.</span>
-
-      <Card className={styles.successCard}>
-        <div><span>Plato</span><strong>{dish.name}</strong></div>
-        <div><span>Proveedor</span><strong>{dish.providerName}</strong></div>
-        <div><span>Cantidad</span><strong>{quantity}</strong></div>
-        <div>
-          <span>Entrega</span>
-          <strong>{delivery === 'office' ? 'Oficina GoGrow' : 'Tu domicilio'} · Lunes 10, 12:30</strong>
-        </div>
-      </Card>
-
-      <div className={styles.successActions}>
-        <Button onClick={onOrders}>Ver mis pedidos</Button>
-        <Button variant="outline" onClick={onMenu}>Volver al menú</Button>
+        <Button disabled={maxQuantity <= 0} onClick={onAddToCart}>Agregar al carrito</Button>
       </div>
     </section>
   )
@@ -354,7 +231,7 @@ function OrderCard({ order }: { order: EmployeeOrder }) {
         <small>{order.id}</small>
       </div>
       <h2>{order.dishName}</h2>
-      <p>{order.providerName}</p>
+      <p>{order.providerName} · {order.quantity} {order.quantity === 1 ? 'plato' : 'platos'}</p>
       <div className={styles.orderMeta}>
         <span><Clock3 aria-hidden="true" />{order.deliveryLabel}</span>
         <strong>${order.amount}</strong>
@@ -364,9 +241,9 @@ function OrderCard({ order }: { order: EmployeeOrder }) {
 }
 
 /** Alterna entre dos colecciones mock sin pedir información al backend. */
-export function OrdersView({ onMenu }: { onMenu: () => void }) {
+export function OrdersView({ onMenu, additionalOrders = [] }: { onMenu: () => void; additionalOrders?: EmployeeOrder[] }) {
   const [tab, setTab] = useState<'upcoming' | 'history'>('upcoming')
-  const orders = tab === 'upcoming' ? upcomingOrders : orderHistory
+  const orders = tab === 'upcoming' ? [...additionalOrders, ...upcomingOrders] : orderHistory
 
   return (
     <section className={styles.view}>
@@ -398,69 +275,8 @@ export function OrdersView({ onMenu }: { onMenu: () => void }) {
   )
 }
 
-/**
- * Estado de cuenta ficticio por proveedor.
- * `sentPayments` permite demostrar el cambio de estado del comprobante durante la sesión.
- */
-export function PaymentsView() {
-  const [sentPayments, setSentPayments] = useState<string[]>([])
-  // La deuda se deriva de los pagos no cerrados para evitar mantener un total duplicado.
-  const totalDebt = providerPayments
-    .filter((payment) => payment.status !== 'paid')
-    .reduce((total, payment) => total + payment.amount, 0)
-
-  /** Marca localmente un comprobante como enviado; se reinicia al recargar. */
-  const sendReceipt = (paymentId: string) => {
-    setSentPayments((current) => current.includes(paymentId) ? current : [...current, paymentId])
-  }
-
-  return (
-    <section className={styles.view}>
-      <ScreenHeader
-        eyebrow="Estado de cuenta"
-        title="Pagos"
-        description="Revisá tu deuda y los comprobantes enviados."
-      />
-
-      <section className={styles.debtCard} aria-labelledby="total-debt-title">
-        <div>
-          <p id="total-debt-title">Deuda total de mayo</p>
-          <strong>${totalDebt}</strong>
-        </div>
-        <span><ReceiptText aria-hidden="true" /></span>
-      </section>
-
-      {/* Cada tarjeta cambia a “Pendiente de validación” sólo durante esta sesión. */}
-      <div className={styles.paymentGrid}>
-        {providerPayments.map((payment) => {
-          const receiptSent = sentPayments.includes(payment.id) || payment.status === 'pending-validation'
-
-          return (
-            <Card className={styles.paymentCard} key={payment.id}>
-              <div className={styles.paymentTopline}>
-                <div>
-                  <p>{payment.period}</p>
-                  <h2>{payment.providerName}</h2>
-                </div>
-                <strong>${payment.amount}</strong>
-              </div>
-              <div className={styles.accountNumber}>
-                <CreditCard aria-hidden="true" />
-                <span><small>Cuenta para transferir</small><strong>{payment.accountNumber}</strong></span>
-              </div>
-              <div className={styles.paymentFooter}>
-                <Badge variant={receiptSent ? 'secondary' : 'outline'} data-sent={receiptSent}>{receiptSent ? 'Pendiente de validación' : payment.dueLabel}</Badge>
-                <Button variant="outline" size="sm" disabled={receiptSent} onClick={() => sendReceipt(payment.id)}>
-                  {receiptSent ? <><FileCheck2 aria-hidden="true" /> Enviado</> : 'Simular comprobante'}
-                </Button>
-              </div>
-            </Card>
-          )
-        })}
-      </div>
-    </section>
-  )
-}
+// El pago mensual vive separado para mantener este archivo centrado en pedidos y cuenta.
+export { MonthlyPayments as PaymentsView } from '@/features/payments/monthly-payments'
 
 /** Preferencias del empleado; sólo cerrar sesión realiza una petición real a Rails. */
 export function AccountView({ email }: { email: string }) {

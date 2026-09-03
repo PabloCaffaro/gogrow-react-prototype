@@ -23,6 +23,9 @@
 
 .sidebar { display: none; }
 
+/* Conserva el alto de la ventana al acompañar el scroll de escritorio. */
+.sidebar { align-self: start; overflow-y: auto; }
+
 .workspace {
   width: 100%;
   max-width: 1180px;

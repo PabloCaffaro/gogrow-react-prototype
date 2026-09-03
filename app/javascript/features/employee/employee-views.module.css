@@ -261,6 +261,8 @@ fieldset.surface {
   text-align: center;
 }
 
+.quantityControl input { height: 40px; text-align: center; }
+
 .deliveryChoices button {
   justify-content: flex-start;
   gap: 10px;

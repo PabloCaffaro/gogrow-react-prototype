@@ -1,0 +1,17 @@
+.page { display: grid; gap: 16px; padding-bottom: 20px; }
+.page h1 { margin: 0; font-size: 1.6rem; }
+.page h2, .page h3, .receipts h3 { margin: 0; font-size: 1rem; }
+.page p, .receipts p { color: var(--muted-foreground); font-size: .85rem; line-height: 1.5; }
+.page select { height: 44px; }
+.layout, .receipts { display: grid; gap: 16px; min-width: 0; }
+.debt { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.debt > div { display: grid; gap: 8px; min-width: 0; }
+.debt [data-slot=badge] { white-space: normal; width: fit-content; }
+.debt small { font-size: .7rem; color: var(--muted-foreground); overflow-wrap: anywhere; }
+.summary { align-self: start; }
+.summary button { width: 100%; margin-top: 12px; height: auto; min-height: 42px; white-space: normal; }
+.summary input { margin-top: 12px; height: auto; }
+.filename { overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.actions button { min-height: 42px; height: auto; white-space: normal; }
+@media(min-width: 1100px) { .layout { grid-template-columns: minmax(0, 1fr) 320px; } .receipts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

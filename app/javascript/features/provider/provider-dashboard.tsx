@@ -3,8 +3,10 @@
  * Todas las operaciones de menús, pedidos y cobros son simulaciones en memoria;
  * únicamente cerrar sesión realiza una petición real a Rails mediante Inertia.
  */
+import { ReceiptList } from '@/features/payments/monthly-payments'
 import { router } from '@inertiajs/react'
 import { useMemo, useState } from 'react'
+import { usePrototypeNavigation } from '@/lib/use-prototype-navigation'
 import { BarChart3, Bell, CalendarDays, Check, ChevronRight, CircleDollarSign, Clock3, Copy, Eye, Home, LogOut, MapPin, PackageCheck, Plus, ReceiptText, Settings2, Store, TicketPercent, UserRound, UtensilsCrossed, X } from 'lucide-react'
 import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
@@ -36,7 +38,8 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
 
 export function ProviderDashboard({ email }: Props) {
   // Navegación principal y fecha del menú que el proveedor está editando.
-  const [section, setSection] = useState<ProviderSection>('home')
+  const navigation = usePrototypeNavigation<ProviderSection>('home')
+  const section = navigation.route.section
   const [day, setDay] = useState(providerDays[0].id)
 
   // Copias editables de los mocks; todos estos cambios se pierden al recargar.
@@ -48,7 +51,8 @@ export function ProviderDashboard({ email }: Props) {
   // Estado de controles visuales: filtros, selección, paneles y preferencias.
   const [orderFilter, setOrderFilter] = useState<'all' | ProviderOrderStatus>('all')
   const [paymentFilter, setPaymentFilter] = useState<'all' | PaymentStatus>('all')
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null)
+  const selectedOrder = navigation.route.detail
+  const setSelectedOrder = (id: string | null) => navigation.navigate({ section: 'orders', detail: id ?? undefined })
   const [reuseOpen, setReuseOpen] = useState(false)
   const [notifications, setNotifications] = useState(true)
   const [closingHours, setClosingHours] = useState(1)
@@ -60,7 +64,7 @@ export function ProviderDashboard({ email }: Props) {
   const visiblePayments = useMemo(() => payments.filter(payment => paymentFilter === 'all' || payment.status === paymentFilter), [payments, paymentFilter])
   const detail = orders.find(order => order.id === selectedOrder)
   /** Cambia de sección, cierra el detalle actual y vuelve al inicio del documento. */
-  const navigate = (next: ProviderSection) => { setSection(next); setSelectedOrder(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  const navigate = (next: ProviderSection) => navigation.navigate({ section: next })
 
   /** Informa el resultado de una acción mock mediante un mensaje temporal. */
   const announce = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2500) }
@@ -99,7 +103,7 @@ export function ProviderDashboard({ email }: Props) {
   const account = <><Header eyebrow="Preferencias" title="Mi cuenta" description="Administrá tus datos y notificaciones." /><div className={styles.account}><div><section className={styles.profile}><span className={styles.bigAvatar}>{providerProfile.initials}</span><div><h2>{providerProfile.name}</h2><p>{providerProfile.owner}</p><small>{email}</small></div></section><section className={styles.surface}><div className={styles.setting}><Bell /><span><strong>Notificaciones por WhatsApp</strong><small>Menús, pedidos y cancelaciones.</small></span><button className={styles.switch} role="switch" aria-checked={notifications} data-enabled={notifications} onClick={() => setNotifications(value => !value)}><i /></button></div></section></div><aside><section className={styles.coupon}><TicketPercent /><span><small>Cupones disponibles</small><strong>{providerProfile.coupons}</strong><p>Aplicables a próximas comisiones.</p></span></section><section className={styles.surface}><button className={styles.accountLink}><UserRound /> Datos personales <ChevronRight /></button><button className={styles.accountLink} onClick={() => router.delete('/logout')}><LogOut /> Cerrar sesión <ChevronRight /></button></section></aside></div></>
 
   // Mapa que relaciona cada opción de navegación con su vista React.
-  const views: Record<ProviderSection, React.ReactNode> = { home, menu, orders: ordersView, payments: paymentView, insights, account }
+  const views: Record<ProviderSection, React.ReactNode> = { home, menu, orders: ordersView, payments: <>{paymentView}<h2>Pagos agrupados por mes</h2><ReceiptList provider={providerProfile.name} canReview /></>, insights, account }
   return <div className={`${styles.page} ${interactionStyles.scope}`}><aside className={styles.sidebar}><button type="button" className={`${styles.brand} ${interactionStyles.brandButton}`} onClick={() => navigate('home')} aria-label="Ir al inicio principal del proveedor"><span><Store /></span><strong>GoGrow</strong><small>Proveedor</small></button><nav>{(Object.entries(nav) as Array<[ProviderSection, { label: string; icon: Icon }]>).map(([key, item]) => <button key={key} data-active={section === key} onClick={() => navigate(key)}><item.icon /><span>{item.label}</span></button>)}</nav><div className={styles.sidebarUser}><span className={styles.avatar}>{providerProfile.initials}</span><div><strong>{providerProfile.name}</strong><small>{email}</small></div></div></aside><main className={styles.workspace}>{views[section]}</main><nav className={`${styles.mobileNav} ${interactionStyles.sixColumnNav}`}>{(['home', 'menu', 'orders', 'payments', 'insights', 'account'] as ProviderSection[]).map(key => { const item = nav[key]; return <button key={key} data-active={section === key} onClick={() => navigate(key)}><item.icon /><span>{item.label}</span></button> })}</nav>{toast && <div className={styles.toast} role="status"><Check />{toast}</div>}</div>
 }
 

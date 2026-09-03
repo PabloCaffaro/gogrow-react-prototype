@@ -72,6 +72,11 @@ Evitar:
 
 Por defecto, los cambios realizados por el usuario en la interfaz se mantienen solamente en estado React y se reinician al recargar. Agregar `localStorage` únicamente si el usuario lo pide.
 
+El carrito y los nuevos pedidos viven en el dashboard del empleado. Los pagos
+agrupados usan un store frontend compartido: permite informar un comprobante como
+empleado y validarlo como proveedor en la misma pestaña, sin recargar. Guarda sólo
+el nombre del archivo, no lo sube. Recargar restablece los escenarios de ejemplo.
+
 ## Estado actual de la interfaz
 
 El flujo más desarrollado es el dashboard del empleado:
@@ -82,12 +87,16 @@ El flujo más desarrollado es el dashboard del empleado:
 - Selector de días.
 - Filtro por proveedor.
 - Listado de platos.
-- Selección y deselección de un plato.
+- Carrito con varios platos, agrupado por proveedor y fecha de entrega.
+- Máximo de 20 unidades por plato (suma de variantes del mismo proveedor).
+- Resumen de cantidad total de unidades y precio; edición y eliminación de líneas.
 - Detalle y personalización del plato.
 - Elección de cantidad y lugar de entrega.
 - Revisión, confirmación y estado exitoso del pedido.
 - Consulta de próximos pedidos e historial.
-- Estado de cuenta por proveedor y simulación de comprobantes.
+- Deudas mensuales por proveedor: selección de uno o varios meses completos.
+- Un comprobante para los meses seleccionados del mismo proveedor; pasa a
+  pendiente de validación. El proveedor puede confirmarlo u observarlo.
 - Perfil, beneficio asignado y preferencia de notificaciones.
 - Estado vacío demostrable: el viernes 14 no tiene viandas publicadas.
 - Estados `hover` para puntero y `focus-visible` para navegación con teclado.
@@ -188,6 +197,14 @@ type EmployeeView = 'menu' | 'dish-detail' | 'checkout' | 'orders'
 ```
 
 Mantener cada flujo dentro del frontend del rol correspondiente. La migración futura a navegación Inertia real debe poder hacerse sin reescribir los componentes visuales.
+
+`lib/use-prototype-navigation.ts` registra las pantallas internas mediante
+`router.push` de Inertia (visitas sólo cliente, sin HTTP). Los parámetros de URL
+identifican secciones y detalles; `prototypeNavigation` guarda sólo la ubicación
+visual en las props del historial. El layout persistente en
+`pages/dashboard/show.tsx` conserva el dashboard y su carrito al usar
+Atrás/Adelante. No interceptar `popstate` ni modificar las rutas del backend.
+Recargar reinicia los datos de la demostración.
 
 ## Componentes y TypeScript
 

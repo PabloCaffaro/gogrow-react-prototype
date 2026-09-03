@@ -4,8 +4,8 @@
  * endpoints de menús, pedidos o pagos.
  */
 import { useMemo, useState } from 'react'
+import { usePrototypeNavigation } from '@/lib/use-prototype-navigation'
 import {
-  Check,
   ClipboardList,
   DollarSign,
   Plus,
@@ -22,13 +22,14 @@ import { Card, CardContent } from '@/components/ui/data-display/card'
 import { dishes, employeePrototype, menuDays } from '@/mocks/employee-home'
 import {
   AccountView,
-  CheckoutView,
   DishDetailView,
   OrdersView,
-  OrderSuccessView,
   PaymentsView,
 } from './employee-views'
 import styles from './employee-dashboard.module.css'
+import { CartView } from './cart-view'
+import { useCart, cartCount, cartTotal, deliveryKey, money, type CartLine } from './use-cart'
+import type { EmployeeOrder } from '@/domain/employee'
 
 type Props = {
   email: string
@@ -36,6 +37,8 @@ type Props = {
 
 /** `all` representa la vista combinada de los proveedores conocidos. */
 type ProviderFilter = 'all' | ProviderId
+
+type DishDraft = { quantity: number; customization: string; notes: string; delivery: DeliveryLocation }
 
 const providerFilters: Array<{ id: ProviderFilter; label: string }> = [
   { id: 'all', label: 'Todos' },
@@ -117,18 +120,29 @@ function NavigationItem({
  */
 export function EmployeeDashboard({ email }: Props) {
   // Navegación interna: estas vistas no crean entradas nuevas en `config/routes.rb`.
-  const [view, setView] = useState<EmployeeView>('menu')
+  const navigation = usePrototypeNavigation<EmployeeView>('menu')
+  const view = navigation.route.section
 
   // Estado del menú semanal y del plato actualmente seleccionado.
   const [selectedDay, setSelectedDay] = useState(menuDays[0].id)
   const [providerFilter, setProviderFilter] = useState<ProviderFilter>('all')
-  const [selectedDishId, setSelectedDishId] = useState<number | null>(null)
+  const selectedDishId = navigation.route.detail
 
-  // Configuración temporal del pedido mientras el usuario avanza por el flujo.
-  const [quantity, setQuantity] = useState(1)
-  const [customization, setCustomization] = useState('')
-  const [notes, setNotes] = useState('')
-  const [delivery, setDelivery] = useState<DeliveryLocation>('office')
+  // Un borrador por plato evita mezclar opciones al volver con Atrás/Adelante.
+  const [drafts, setDrafts] = useState<Record<number, DishDraft>>({})
+  const draft = typeof selectedDishId === 'number' ? drafts[selectedDishId] : undefined
+  const { quantity = 1, customization = '', notes = '', delivery = 'office' } = draft ?? {}
+  const updateDraft = (patch: Partial<DishDraft>) => {
+    if (typeof selectedDishId !== 'number' || !draft) return
+    setDrafts(current => ({ ...current, [selectedDishId]: { ...current[selectedDishId], ...patch } }))
+  }
+  // El carrito sobrevive a cambios de sección, pero no a una recarga.
+  const cart = useCart()
+  const [confirmed, setConfirmed] = useState<CartLine[]>([])
+  const [confirmedDeliveries, setConfirmedDeliveries] = useState<Record<string, DeliveryLocation>>({})
+  const [newOrders, setNewOrders] = useState<EmployeeOrder[]>([])
+  const count = cartCount(cart.lines)
+  const total = cartTotal(cart.lines)
 
   // La lista visible siempre se deriva de los mocks; no se duplica en estado React.
   const visibleDishes = useMemo(
@@ -151,30 +165,53 @@ export function EmployeeDashboard({ email }: Props) {
 
   /** Cambia de subpantalla y devuelve el documento al inicio. */
   const navigate = (nextView: EmployeeView) => {
-    setView(nextView)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigation.navigate({ section: nextView })
   }
 
   /** Cambiar de día invalida cualquier selección perteneciente al día anterior. */
   const chooseDay = (dayId: string) => {
     setSelectedDay(dayId)
-    setSelectedDishId(null)
   }
 
-  /** El mismo control permite seleccionar y deseleccionar un plato. */
+  /** Abre la personalización sin descartar platos ya agregados. */
   const toggleDish = (dishId: number) => {
-    setSelectedDishId((current) => current === dishId ? null : dishId)
+    const dish = dishes.find(item => item.id === dishId)
+    if (!dish || cart.available(dish) <= 0) return
+    setDrafts(current => ({ ...current, [dishId]: {
+      quantity: 1, customization: dish.customizations?.[0] ?? '', notes: '',
+      delivery: cart.deliveries[deliveryKey(dish)] ?? 'office',
+    } }))
+    navigation.navigate({ section: 'dish-detail', detail: dishId })
   }
 
-  /** Inicializa valores seguros antes de entrar al detalle del plato. */
-  const startOrder = () => {
+  /** El destino se comparte entre todas las líneas del mismo proveedor y fecha. */
+  const addToCart = () => {
     if (!selectedDish) return
+    cart.add(selectedDish, quantity, customization, notes)
+    cart.setDelivery(deliveryKey(selectedDish), delivery)
+    navigate('menu')
+  }
 
-    setQuantity(1)
-    setCustomization(selectedDish.customizations?.[0] ?? '')
-    setNotes('')
-    setDelivery('office')
-    navigate('dish-detail')
+  /** Confirmación local: conserva el resumen y agrega las líneas a Mis pedidos. */
+  const confirmCart = () => {
+    if (!cart.lines.length) return
+    const reference = crypto.randomUUID().slice(0, 8)
+    setConfirmed(cart.lines)
+    setConfirmedDeliveries(cart.deliveries)
+    setNewOrders(current => [...cart.lines.map((line, index): EmployeeOrder => {
+      const day = menuDays.find(item => item.id === line.dish.dayId)
+      return {
+        id: `PED-${reference}-${index + 1}`,
+        dishName: line.dish.name,
+        providerName: line.dish.providerName,
+        quantity: line.quantity,
+        amount: line.quantity * line.dish.price,
+        deliveryLabel: `${day?.shortName} ${day?.date} · 12:30 · ${cart.deliveries[deliveryKey(line.dish)] === 'home' ? 'Domicilio' : 'Oficina'}`,
+        status: 'confirmed',
+      }
+    }), ...current])
+    cart.clear()
+    navigate('order-success')
   }
 
   /** Portada semanal; se extrae para mantener legible el selector de vistas final. */
@@ -251,7 +288,7 @@ export function EmployeeDashboard({ email }: Props) {
           {/* El listado contiene tarjetas visuales o un estado vacío según los mocks. */}
           <div className={styles.menuList} aria-live="polite">
             {visibleDishes.length > 0 ? visibleDishes.map((dish) => {
-              const isSelected = selectedDishId === dish.id
+              const isSelected = cart.lines.some(line => line.dish.id === dish.id)
 
               return (
                 <Card className={styles.dishCard} size="sm" key={dish.id} data-selected={isSelected}>
@@ -266,9 +303,10 @@ export function EmployeeDashboard({ email }: Props) {
                     size="icon"
                     data-selected={isSelected}
                     onClick={() => toggleDish(dish.id)}
-                    aria-label={isSelected ? `Quitar ${dish.name}` : `Agregar ${dish.name}`}
+                    disabled={cart.available(dish) <= 0}
+                    aria-label={`Agregar ${dish.name}`}
                   >
-                    {isSelected ? <Check aria-hidden="true" /> : <Plus aria-hidden="true" />}
+                    <Plus aria-hidden="true" />
                   </Button>
                 </Card>
               )
@@ -294,37 +332,22 @@ export function EmployeeDashboard({ email }: Props) {
           <BenefitCard />
 
           <Card className={styles.selectionCard}>
-            <p className={styles.selectionLabel}>Tu selección</p>
-            {selectedDish ? (
-              <>
-                <h2>{selectedDish.name}</h2>
-                <p>{selectedDish.providerName}</p>
-                <div className={styles.selectionPrice}>
-                  <span>Precio con beneficio</span>
-                  <strong>${selectedDish.price}</strong>
-                </div>
-                <Button className={styles.continueButton} onClick={startOrder}>
-                  Continuar pedido
-                </Button>
-              </>
-            ) : (
-              <div className={styles.noSelection}>
-                <span><Plus aria-hidden="true" /></span>
-                <p>Elegí un plato para comenzar tu pedido.</p>
-              </div>
-            )}
+            <p className={styles.selectionLabel}>Tu carrito</p>
+            <h2>{count} {count === 1 ? 'plato' : 'platos'} · {money(total)}</h2>
+            <p>Agregá platos de distintos días y proveedores.</p>
+            <Button className={styles.continueButton} onClick={() => navigate('checkout')}>Ver carrito</Button>
           </Card>
         </aside>
       </div>
 
       {/* Acción fija exclusiva de móvil cuando ya existe una vianda seleccionada. */}
-      {selectedDish && (
+      {count > 0 && (
         <div className={styles.mobileSelection} role="status">
           <div>
-            <span>Seleccionaste</span>
-            <strong>{selectedDish.name}</strong>
+            <span>Tu carrito</span>
+            <strong>{count} {count === 1 ? 'plato' : 'platos'} · {money(total)}</strong>
           </div>
-          <Button onClick={startOrder}>Continuar</Button>
+          <Button onClick={() => navigate('checkout')}>Ver carrito</Button>
         </div>
       )}
     </>
@@ -374,39 +397,22 @@ export function EmployeeDashboard({ email }: Props) {
         {view === 'dish-detail' && selectedDish && (
           <DishDetailView
             dish={selectedDish}
-            quantity={quantity}
+            quantity={Math.min(quantity, Math.max(1, cart.available(selectedDish)))}
             customization={customization}
             notes={notes}
             delivery={delivery}
             onBack={() => navigate('menu')}
-            onQuantityChange={setQuantity}
-            onCustomizationChange={setCustomization}
-            onNotesChange={setNotes}
-            onDeliveryChange={setDelivery}
-            onReview={() => navigate('checkout')}
+            onQuantityChange={quantity => updateDraft({ quantity })}
+            onCustomizationChange={customization => updateDraft({ customization })}
+            onNotesChange={notes => updateDraft({ notes })}
+            onDeliveryChange={delivery => updateDraft({ delivery })}
+            onAddToCart={addToCart}
+            maxQuantity={cart.available(selectedDish)}
           />
         )}
-        {view === 'checkout' && selectedDish && (
-          <CheckoutView
-            dish={selectedDish}
-            quantity={quantity}
-            customization={customization}
-            notes={notes}
-            delivery={delivery}
-            onBack={() => navigate('dish-detail')}
-            onConfirm={() => navigate('order-success')}
-          />
-        )}
-        {view === 'order-success' && selectedDish && (
-          <OrderSuccessView
-            dish={selectedDish}
-            quantity={quantity}
-            delivery={delivery}
-            onOrders={() => navigate('orders')}
-            onMenu={() => navigate('menu')}
-          />
-        )}
-        {view === 'orders' && <OrdersView onMenu={() => navigate('menu')} />}
+        {view === 'checkout' && <CartView lines={cart.lines} deliveries={cart.deliveries} onQuantity={cart.changeQuantity} onRemove={cart.remove} onDelivery={cart.setDelivery} onBack={() => navigate('menu')} onConfirm={confirmCart} />}
+        {view === 'order-success' && <CartView confirmed lines={confirmed} deliveries={confirmedDeliveries} onQuantity={cart.changeQuantity} onRemove={cart.remove} onDelivery={cart.setDelivery} onBack={() => navigate('menu')} onConfirm={confirmCart} onOrders={() => navigate('orders')} />}
+        {view === 'orders' && <OrdersView additionalOrders={newOrders} onMenu={() => navigate('menu')} />}
         {view === 'payments' && <PaymentsView />}
         {view === 'account' && <AccountView email={email} />}
       </main>

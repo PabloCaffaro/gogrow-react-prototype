@@ -4,6 +4,7 @@
  */
 import { Head, router } from '@inertiajs/react'
 import { useMemo, useState } from 'react'
+import { usePrototypeNavigation } from '@/lib/use-prototype-navigation'
 import {
   ArrowLeft,
   BarChart3,
@@ -104,12 +105,14 @@ function effectiveBenefit(employee: AdminEmployee) {
 
 export function AdminDashboard({ email }: Props) {
   // Estado de navegación: sección principal, empleado abierto y pestaña de su ficha.
-  const [section, setSection] = useState<AdminSection>('home')
+  const navigationState = usePrototypeNavigation<AdminSection>('home')
+  const section = navigationState.route.section
   const [employees, setEmployees] = useState(adminEmployees)
   const [employeeFilter, setEmployeeFilter] = useState<EmployeeFilter>('all')
   const [employeeSearch, setEmployeeSearch] = useState('')
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null)
-  const [detailTab, setDetailTab] = useState<EmployeeDetailTab>('summary')
+  const selectedEmployeeId = navigationState.route.detail
+  const detailTab = navigationState.route.tab ?? 'summary'
+  const setDetailTab = (tab: EmployeeDetailTab) => navigationState.navigate({ section: 'employees', detail: selectedEmployeeId, tab })
 
   // Preferencias y mensajes puramente locales del prototipo.
   const [notifications, setNotifications] = useState(true)
@@ -144,9 +147,7 @@ export function AdminDashboard({ email }: Props) {
 
   /** Cambia de sección principal y cierra cualquier ficha de empleado abierta. */
   const navigate = (nextSection: AdminSection) => {
-    setSection(nextSection)
-    setSelectedEmployeeId(null)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    navigationState.navigate({ section: nextSection })
   }
 
   /** Muestra una confirmación temporal para las acciones simuladas. */
@@ -163,8 +164,7 @@ export function AdminDashboard({ email }: Props) {
 
   /** Abre la ficha y copia la configuración vigente a los campos editables. */
   const openEmployee = (employee: AdminEmployee) => {
-    setSelectedEmployeeId(employee.id)
-    setDetailTab('summary')
+    navigationState.navigate({ section: 'employees', detail: employee.id, tab: 'summary' })
     setBaseAllowance(String(employee.monthlyAllowance))
     setBaseContribution(String(employee.companyContribution))
     setTemporaryAllowance(String(employee.temporaryBenefit?.monthlyAllowance ?? employee.monthlyAllowance))
@@ -244,7 +244,7 @@ export function AdminDashboard({ email }: Props) {
     const debt = totalDebt(selectedEmployee)
     const remaining = Math.max(benefit.monthlyAllowance - selectedEmployee.ordersThisMonth, 0)
     return <>
-      <Button className={styles.backButton} variant="ghost" size="sm" onClick={() => setSelectedEmployeeId(null)}><ArrowLeft /> Volver a empleados</Button>
+      <Button className={styles.backButton} variant="ghost" size="sm" onClick={() => navigate('employees')}><ArrowLeft /> Volver a empleados</Button>
       <Header eyebrow={selectedEmployee.team} title={selectedEmployee.name} description={selectedEmployee.email} />
       {selectedEmployee.temporaryBenefit && <Alert className={styles.temporaryBanner}><Clock3 /><div><AlertTitle>Beneficio temporal activo</AlertTitle><AlertDescription>{selectedEmployee.temporaryBenefit.companyContribution}% de aporte hasta el {selectedEmployee.temporaryBenefit.endsOn}</AlertDescription></div></Alert>}
       <div className={styles.detailTabs} role="tablist" aria-label="Detalle del empleado">{detailTabs.map(([value, label]) => <Button type="button" size="sm" variant={detailTab === value ? 'secondary' : 'ghost'} role="tab" aria-selected={detailTab === value} data-selected={detailTab === value} key={value} onClick={() => setDetailTab(value)}>{label}</Button>)}</div>
