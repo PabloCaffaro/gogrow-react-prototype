@@ -14,7 +14,7 @@ import {
   UtensilsCrossed,
 } from 'lucide-react'
 
-import type { DeliveryLocation, EmployeeView, PrimaryEmployeeSection } from '@/domain/employee'
+import type { DeliveryAddress, DeliveryLocation, EmployeeView, PrimaryEmployeeSection } from '@/domain/employee'
 import type { ProviderId } from '@/domain/menu'
 import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
@@ -141,6 +141,15 @@ export function EmployeeDashboard({ email }: Props) {
   const [confirmed, setConfirmed] = useState<CartLine[]>([])
   const [confirmedDeliveries, setConfirmedDeliveries] = useState<Record<string, DeliveryLocation>>({})
   const [newOrders, setNewOrders] = useState<EmployeeOrder[]>([])
+  // Direcciones de la demo: sólo las guardadas vuelven a aparecer desde Cuenta.
+  const [addresses, setAddresses] = useState<DeliveryAddress[]>([
+    { id: 'home', name: 'Casa', address: 'Av. Brasil 2145, apto. 402', saved: true },
+  ])
+  const addAddress = (name: string, address: string, saved = true) => {
+    const id = `address-${crypto.randomUUID().slice(0, 8)}`
+    setAddresses(current => [...current, { id, name, address, saved }])
+    return id
+  }
   const count = cartCount(cart.lines)
   const total = cartTotal(cart.lines)
 
@@ -206,8 +215,9 @@ export function EmployeeDashboard({ email }: Props) {
         providerName: line.dish.providerName,
         quantity: line.quantity,
         amount: line.quantity * line.dish.price,
-        deliveryLabel: `${day?.shortName} ${day?.date} · 12:30 · ${cart.deliveries[deliveryKey(line.dish)] === 'home' ? 'Domicilio' : 'Oficina'}`,
-        status: 'confirmed',
+        deliveryLabel: `${day?.shortName} ${day?.date} · 12:30 · ${cart.deliveries[deliveryKey(line.dish)] === 'office' ? 'Oficina' : addresses.find(address => address.id === cart.deliveries[deliveryKey(line.dish)])?.name ?? 'Domicilio'}`,
+        // El proveedor debe revisarlo antes de que el empleado lo vea confirmado.
+        status: 'pending',
       }
     }), ...current])
     cart.clear()
@@ -406,15 +416,17 @@ export function EmployeeDashboard({ email }: Props) {
             onCustomizationChange={customization => updateDraft({ customization })}
             onNotesChange={notes => updateDraft({ notes })}
             onDeliveryChange={delivery => updateDraft({ delivery })}
+            addresses={addresses.filter(address => address.saved)}
+            onAddAddress={addAddress}
             onAddToCart={addToCart}
             maxQuantity={cart.available(selectedDish)}
           />
         )}
-        {view === 'checkout' && <CartView lines={cart.lines} deliveries={cart.deliveries} onQuantity={cart.changeQuantity} onRemove={cart.remove} onDelivery={cart.setDelivery} onBack={() => navigate('menu')} onConfirm={confirmCart} />}
-        {view === 'order-success' && <CartView confirmed lines={confirmed} deliveries={confirmedDeliveries} onQuantity={cart.changeQuantity} onRemove={cart.remove} onDelivery={cart.setDelivery} onBack={() => navigate('menu')} onConfirm={confirmCart} onOrders={() => navigate('orders')} />}
+        {view === 'checkout' && <CartView lines={cart.lines} deliveries={cart.deliveries} onQuantity={cart.changeQuantity} onRemove={cart.remove} onDelivery={cart.setDelivery} addresses={addresses} onAddAddress={addAddress} onBack={() => navigate('menu')} onConfirm={confirmCart} />}
+        {view === 'order-success' && <CartView confirmed lines={confirmed} deliveries={confirmedDeliveries} onQuantity={cart.changeQuantity} onRemove={cart.remove} onDelivery={cart.setDelivery} addresses={addresses} onAddAddress={addAddress} onBack={() => navigate('menu')} onConfirm={confirmCart} onOrders={() => navigate('orders')} />}
         {view === 'orders' && <OrdersView additionalOrders={newOrders} onMenu={() => navigate('menu')} />}
         {view === 'payments' && <PaymentsView />}
-        {view === 'account' && <AccountView email={email} />}
+        {view === 'account' && <AccountView email={email} addresses={addresses.filter(address => address.saved)} onAddAddress={addAddress} />}
       </main>
 
       {showPrimaryNavigation && (

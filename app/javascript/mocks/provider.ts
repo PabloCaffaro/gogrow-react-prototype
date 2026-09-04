@@ -1,4 +1,4 @@
-import type { EmployeePayment, ProviderDish, ProviderOrder } from '@/domain/provider'
+import type { CompanySettlement, EmployeePayment, ProviderDish, ProviderOrder } from '@/domain/provider'
 
 export const providerProfile = {
   name: 'Endulzate by Noe',
@@ -16,14 +16,14 @@ export const providerDays = [
 ]
 
 export const initialDishes: ProviderDish[] = [
-  { id: 1, name: 'Wok de verduras + arroz', description: 'Vegetales frescos salteados, arroz blanco y salsa suave.', price: 300, available: true },
-  { id: 2, name: 'Sorrentinos artesanales', description: 'Jamón y queso o caprese, con salsa a elección.', price: 320, available: true },
-  { id: 3, name: 'Pollo al curry', description: 'Curry suave, arroz basmati y vegetales de estación.', price: 360, available: false },
+  { id: 1, name: 'Wok de verduras + arroz', description: 'Vegetales frescos salteados, arroz blanco y salsa suave.', price: 300, available: true, dayId: 'lun-26' },
+  { id: 2, name: 'Sorrentinos artesanales', description: 'Jamón y queso o caprese, con salsa a elección.', price: 320, available: true, dayId: 'lun-26' },
+  { id: 3, name: 'Pollo al curry', description: 'Curry suave, arroz basmati y vegetales de estación.', price: 360, available: false, dayId: 'lun-26' },
 ]
 
 export const reusableDishes: ProviderDish[] = [
-  { id: 20, name: 'Lasagna de verduras', description: 'Vegetales, salsa de tomate y queso gratinado.', price: 340, available: true, reused: true },
-  { id: 21, name: 'Tarta de calabaza', description: 'Calabaza, queso y cebolla caramelizada con ensalada.', price: 310, available: true, reused: true },
+  { id: 20, name: 'Lasagna de verduras', description: 'Vegetales, salsa de tomate y queso gratinado.', price: 340, available: true, dayId: '', reused: true },
+  { id: 21, name: 'Tarta de calabaza', description: 'Calabaza, queso y cebolla caramelizada con ensalada.', price: 310, available: true, dayId: '', reused: true },
 ]
 
 export const initialOrders: ProviderOrder[] = [
@@ -37,5 +37,13 @@ export const initialOrders: ProviderOrder[] = [
 export const initialPayments: EmployeePayment[] = [
   { id: 'PAG-220', employee: 'Martina Silva', period: 'Mayo 2026', amount: 900, date: '26 may', status: 'pending', receipt: 'comprobante-martina.pdf' },
   { id: 'PAG-219', employee: 'Lucas Pereira', period: 'Mayo 2026', amount: 640, date: '25 may', status: 'pending', receipt: 'transferencia-lucas.jpg' },
+  { id: 'PAG-216', employee: 'Sofía', period: 'Mayo 2026', amount: 450, date: '24 may', status: 'due', receipt: 'Sin comprobante informado' },
   { id: 'PAG-214', employee: 'Camila Díaz', period: 'Abril 2026', amount: 1200, date: '5 may', status: 'confirmed', receipt: 'comprobante-camila.pdf' },
+]
+
+/** Datos de ejemplo del aporte de la empresa; no se vinculan a una cuenta real. */
+export const initialCompanySettlements: CompanySettlement[] = [
+  { id: 'LIQ-0526', period: 'Mayo 2026', meals: 84, amount: 12600, dueDate: '5 jun', status: 'review' },
+  { id: 'LIQ-0426', period: 'Abril 2026', meals: 76, amount: 11400, dueDate: '5 may', status: 'confirmed' },
+  { id: 'LIQ-0326', period: 'Marzo 2026', meals: 69, amount: 10350, dueDate: '5 abr', status: 'pending' },
 ]

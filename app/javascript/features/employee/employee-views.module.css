@@ -944,6 +944,15 @@ fieldset.surface {
   width: 17px;
 }
 
+/* Direcciones: el formulario permite guardarlas o elegirlas luego al pedir. */
+.newAddress,
+.addressForm { display: grid; margin-top: 14px; gap: 9px; }
+.newAddress > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.savedAddress { display: flex; padding: 10px 0; border-bottom: 1px solid #ededed; align-items: start; gap: 9px; }
+.savedAddress svg { width: 17px; margin-top: 2px; }
+.savedAddress span { display: grid; gap: 2px; }
+.savedAddress small { color: #73736f; font-size: .7rem; }
+
 @media (min-width: 900px) {
   /* Las subpantallas pasan a dos columnas y eliminan las acciones fijas. */
   .screenHeader {

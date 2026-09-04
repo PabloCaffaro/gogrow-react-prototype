@@ -25,8 +25,8 @@ import {
   WalletCards,
 } from 'lucide-react'
 
-import type { AdminEmployee, AdminPaymentStatus, AdminSection, TemporaryBenefit } from '@/domain/admin'
-import { adminActivity, adminEmployees, adminPayments, adminProfile } from '@/mocks/admin'
+import type { AdminEmployee, AdminSection, TemporaryBenefit } from '@/domain/admin'
+import { adminActivity, adminEmployees, adminProfile } from '@/mocks/admin'
 import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/data-display/card'
@@ -34,6 +34,7 @@ import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/u
 import { Input } from '@/components/ui/forms/input'
 import { Label } from '@/components/ui/forms/label'
 import { Select } from '@/components/ui/forms/select'
+import { MonthlyPayments } from '@/features/payments/monthly-payments'
 import styles from './admin-dashboard.module.css'
 
 type Props = { email: string }
@@ -50,13 +51,6 @@ const navigation: Record<AdminSection, { label: string; icon: Icon }> = {
   payments: { label: 'Liquidaciones', icon: CircleDollarSign },
   insights: { label: 'Métricas', icon: BarChart3 },
   account: { label: 'Cuenta', icon: UserRound },
-}
-
-const paymentLabels: Record<AdminPaymentStatus, string> = {
-  pending: 'Por revisar',
-  validated: 'Validada',
-  observed: 'Observada',
-  paid: 'Pagada',
 }
 
 const employeeFilters: Array<[EmployeeFilter, string]> = [
@@ -285,7 +279,8 @@ export function AdminDashboard({ email }: Props) {
   const employeesView = selectedEmployee ? employeeDetail : employeeList
 
   // Las siguientes constantes son vistas presentacionales de cada sección principal.
-  const payments = <><Header eyebrow="Control de aportes" title="Liquidaciones" description="Validá cuánto corresponde aportar a la empresa por cada proveedor y período." /><section className={styles.paymentSummary}><Stat label="Por revisar" value="$42.840" note="1 liquidación" /><Stat label="Validadas" value="$56.320" note="Listas para gestión externa" /><Stat label="Pagadas en mayo" value="$96.410" note="Confirmadas con comprobante" /></section><section className={styles.paymentList} aria-label="Liquidaciones por proveedor">{adminPayments.map((payment) => <Card className={styles.payment} size="sm" key={payment.id}><span className={styles.paymentIcon}><CircleDollarSign /></span><div><small>{payment.id} · {payment.period}</small><h2>{payment.provider}</h2><p>{payment.orders} pedidos · Total ${payment.grossAmount.toLocaleString('es-UY')}</p></div><strong>${payment.amount.toLocaleString('es-UY')}</strong><Badge variant="outline" data-status={payment.status}>{paymentLabels[payment.status]}</Badge><div className={styles.paymentBreakdown}><span>Empleados: ${payment.employeeShare.toLocaleString('es-UY')}</span>{payment.adjustment && <span>Ajuste: ${payment.adjustment}</span>}</div><Button variant="ghost" size="sm" onClick={() => announce(`Detalle de ${payment.id}`)}>Ver detalle</Button></Card>)}</section></>
+  // Administración controla los meses adeudados, sin repetir el listado de comprobantes.
+  const payments = <MonthlyPayments mode="admin" showReceipts={false} />
 
   const insights = <><Header eyebrow="Últimos 30 días" title="Métricas" description="Una lectura del uso del beneficio mensual en la organización." /><section className={styles.stats}><Stat label="Pedidos" value="1.248" note="+9% frente a abril" /><Stat label="Usuarios frecuentes" value="92" note="72% de los empleados" /><Stat label="Ticket promedio" value="$318" note="Empresa aporta $159" /><Stat label="Uso del beneficio" value="81%" note="Promedio mensual" /></section><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Tendencia mensual</p><h2>Pedidos por semana</h2></div></div><p className={styles.chartHelp}>La división semanal permite observar el ritmo de consumo, pero el beneficio se contabiliza sobre el total mensual.</p><div className={styles.chart}>{[58, 72, 66, 88].map((height, index) => <div key={height}><span style={{ height: `${height}%` }} /><small>Semana {index + 1}</small></div>)}</div></section></>
 

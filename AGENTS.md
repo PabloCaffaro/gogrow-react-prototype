@@ -94,9 +94,13 @@ El flujo más desarrollado es el dashboard del empleado:
 - Elección de cantidad y lugar de entrega.
 - Revisión, confirmación y estado exitoso del pedido.
 - Consulta de próximos pedidos e historial.
+- Cancelación local de una vianda cuyo pedido sigue pendiente.
+- Domicilios guardados desde Cuenta y domicilios de uso único al pedir.
 - Deudas mensuales por proveedor: selección de uno o varios meses completos.
 - Un comprobante para los meses seleccionados del mismo proveedor; pasa a
   pendiente de validación. El proveedor puede confirmarlo u observarlo.
+- Pagos separados visualmente entre pendientes y pagados; gris para pendientes
+  y verde para pagos confirmados. Administración usa la misma pantalla mensual.
 - Perfil, beneficio asignado y preferencia de notificaciones.
 - Estado vacío demostrable: el viernes 14 no tiene viandas publicadas.
 - Estados `hover` para puntero y `focus-visible` para navegación con teclado.
@@ -128,6 +132,14 @@ encuentra en su primera etapa funcional:
 - Métricas accesibles tanto desde escritorio como desde la navegación móvil.
 - Marca GoGrow clickeable que vuelve al inicio principal en los tres roles.
 - Contenido administrativo centralizado en mocks TypeScript, sin persistencia.
+
+El proveedor puede editar platos mientras el menú está en borrador. También se
+muestra una acción de importación desde Excel, pero no procesa todavía el
+archivo. En Cobros hay filtros mock por mes y por estado: pendiente de pago,
+comprobante por confirmar o confirmado. Esa sección está separada entre
+**Cobros a empleados** (incluye comprobantes agrupados para revisar) y
+**Cobro a GoGrow** (liquidaciones mock del aporte corporativo); no mezclar
+ambos flujos ni crear persistencia para ellos.
 
 En móvil no deben desaparecer secciones presentes en escritorio. El proveedor
 expone también Métricas en su barra inferior; el empleado mantiene Menú,

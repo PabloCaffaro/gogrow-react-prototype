@@ -1,4 +1,5 @@
 /** Vistas visuales del carrito: el dashboard conserva los datos entre pantallas. */
+import { useState } from 'react'
 import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/actions/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/data-display/card'
@@ -7,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/feedback/alert'
 import { Input } from '@/components/ui/forms/input'
 import { Label } from '@/components/ui/forms/label'
 import { Select } from '@/components/ui/forms/select'
-import type { DeliveryLocation } from '@/domain/employee'
+import type { DeliveryAddress, DeliveryLocation } from '@/domain/employee'
 import { menuDays } from '@/mocks/employee-home'
 import { cartCount, cartTotal, deliveryKey, money, sameDish, type CartLine } from './use-cart'
 import styles from './cart-view.module.css'
@@ -20,12 +21,14 @@ type Props = {
   onDelivery: (key: string, delivery: DeliveryLocation) => void
   onBack: () => void
   onConfirm: () => void
+  addresses: DeliveryAddress[]
+  onAddAddress: (name: string, address: string, saved?: boolean) => string
   confirmed?: boolean
   onOrders?: () => void
 }
 
 /** Cada grupo corresponde a una entrega de un proveedor en una fecha. */
-export function CartView({ lines, deliveries, onQuantity, onRemove, onDelivery, onBack, onConfirm, confirmed = false, onOrders }: Props) {
+export function CartView({ lines, deliveries, onQuantity, onRemove, onDelivery, onBack, onConfirm, addresses, onAddAddress, confirmed = false, onOrders }: Props) {
   const groups = [...new Set(lines.map(line => deliveryKey(line.dish)))]
   const count = cartCount(lines)
   return <section className={styles.page}>
@@ -54,7 +57,7 @@ export function CartView({ lines, deliveries, onQuantity, onRemove, onDelivery, 
                 </article>
               })}
               <Label htmlFor={`delivery-${key}`}>Entrega para este proveedor y día</Label>
-              {confirmed ? <p>{deliveries[key] === 'home' ? 'Domicilio' : 'Oficina GoGrow'}</p> : <Select id={`delivery-${key}`} value={deliveries[key] ?? 'office'} onChange={event => onDelivery(key, event.target.value as DeliveryLocation)}><option value="office">Oficina GoGrow</option><option value="home">Domicilio guardado</option></Select>}
+              {confirmed ? <p>{deliveries[key] === 'office' ? 'Oficina GoGrow' : addresses.find(address => address.id === deliveries[key])?.address ?? 'Domicilio'}</p> : <DeliverySelector id={key} value={deliveries[key] ?? 'office'} addresses={addresses} onChange={value => onDelivery(key, value)} onAddAddress={onAddAddress} />}
             </CardContent>
           </Card>
         })}
@@ -67,4 +70,17 @@ export function CartView({ lines, deliveries, onQuantity, onRemove, onDelivery, 
       </CardContent></Card></div>
     </>}
   </section>
+}
+
+/** El domicilio nuevo se puede usar una vez o guardar para próximos pedidos. */
+function DeliverySelector({ id, value, addresses, onChange, onAddAddress }: { id: string; value: DeliveryLocation; addresses: DeliveryAddress[]; onChange: (value: DeliveryLocation) => void; onAddAddress: (name: string, address: string, saved?: boolean) => string }) {
+  const [name, setName] = useState('')
+  const [address, setAddress] = useState('')
+  const add = (saved: boolean) => {
+    if (!name.trim() || !address.trim()) return
+    onChange(onAddAddress(name.trim(), address.trim(), saved))
+    setName(''); setAddress('')
+  }
+  const isNewAddress = value === 'new-address'
+  return <div className={styles.deliverySelector}><Select id={`delivery-${id}`} value={value} onChange={event => onChange(event.target.value)}><option value="office">Oficina GoGrow</option>{addresses.map(address => <option value={address.id} key={address.id}>{address.name} · {address.address}</option>)}<option value="new-address">Nueva dirección</option></Select>{isNewAddress && <div className={styles.newAddressFields} data-selected="true"><strong>Nueva dirección para este pedido</strong><Input value={name} onChange={event => setName(event.target.value)} placeholder="Nombre, ej. Trabajo" aria-label="Nombre del otro domicilio" /><Input value={address} onChange={event => setAddress(event.target.value)} placeholder="Dirección completa" aria-label="Dirección para este pedido" /><div><Button variant="outline" size="sm" disabled={!name.trim() || !address.trim()} onClick={() => add(false)}>Usar sólo hoy</Button><Button size="sm" disabled={!name.trim() || !address.trim()} onClick={() => add(true)}>Guardar domicilio</Button></div></div>}</div>
 }

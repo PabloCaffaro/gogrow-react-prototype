@@ -4,9 +4,23 @@
 .page p, .receipts p { color: var(--muted-foreground); font-size: .85rem; line-height: 1.5; }
 .page select { height: 44px; }
 .layout, .receipts { display: grid; gap: 16px; min-width: 0; }
+.providerCard { border-color: #d8d8d3; background: linear-gradient(135deg, #fff, #f7f7f4); }
+.providerCard [data-slot=card-header] { gap: 4px; }
+.providerCard [data-slot=card-header] > p:first-child { margin: 0; font-size: .7rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+.providerCard [data-slot=card-header] > strong { margin-top: 6px; font-size: 1.12rem; }
+.paymentGroups { border-color: #d8d8d3; }
 .debt { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
 .debt > div { display: grid; gap: 8px; min-width: 0; }
 .debt [data-slot=badge] { white-space: normal; width: fit-content; }
+.statusGroup { margin-top: 18px; padding: 14px; border: 1px solid #e0e0dc; border-radius: 12px; background: #fcfcfa; }
+.statusGroup:first-child { margin-top: 0; }
+.emptyGroup { margin: 8px 0 2px; padding: 10px; border: 1px dashed #d4d4cf; border-radius: 9px; color: #73736e !important; font-size: .78rem !important; }
+.groupTitle { margin: 0 0 6px; color: #454540; font-size: .83rem !important; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+.statusGroup:has([data-payment-status=due]) { border-left: 4px solid #a5a5a0; }
+.statusGroup:has([data-payment-status=pending]) { border-left: 4px solid #d1a847; }
+.statusGroup:has([data-payment-status=paid]) { border-left: 4px solid #56a169; }
+.debt [data-payment-status=due], .debt [data-payment-status=pending] { border-color: #d5d5d1; background: #eeeeeb; color: #666661; }
+.debt [data-payment-status=paid] { border-color: #b9ddc2; background: #e7f4ea; color: #33774a; }
 .debt small { font-size: .7rem; color: var(--muted-foreground); overflow-wrap: anywhere; }
 .summary { align-self: start; }
 .summary button { width: 100%; margin-top: 12px; height: auto; min-height: 42px; white-space: normal; }

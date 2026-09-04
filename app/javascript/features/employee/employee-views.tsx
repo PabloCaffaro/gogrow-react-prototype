@@ -21,7 +21,7 @@ import {
   UtensilsCrossed,
 } from 'lucide-react'
 
-import type { DeliveryLocation, EmployeeOrder } from '@/domain/employee'
+import type { DeliveryAddress, DeliveryLocation, EmployeeOrder } from '@/domain/employee'
 import type { Dish } from '@/domain/menu'
 import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
@@ -70,6 +70,8 @@ type DetailProps = {
   onDeliveryChange: (delivery: DeliveryLocation) => void
   onAddToCart: () => void
   maxQuantity: number
+  addresses: DeliveryAddress[]
+  onAddAddress: (name: string, address: string, saved?: boolean) => string
 }
 
 /**
@@ -89,9 +91,19 @@ export function DishDetailView({
   onDeliveryChange,
   onAddToCart,
   maxQuantity,
+  addresses,
+  onAddAddress,
 }: DetailProps) {
   // En el prototipo `price` ya representa el precio unitario con beneficio.
   const total = dish.price * quantity
+  const [newAddressName, setNewAddressName] = useState('')
+  const [newAddress, setNewAddress] = useState('')
+  const useNewAddress = (saved: boolean) => {
+    if (!newAddressName.trim() || !newAddress.trim()) return
+    onDeliveryChange(onAddAddress(newAddressName.trim(), newAddress.trim(), saved))
+    setNewAddressName('')
+    setNewAddress('')
+  }
 
   return (
     <section className={styles.view}>
@@ -188,15 +200,13 @@ export function DishDetailView({
                 <Home aria-hidden="true" />
                 <span><strong>Oficina</strong><small>18 de Julio 1006</small></span>
               </Button>
-              <Button variant="outline"
-                type="button"
-                data-selected={delivery === 'home'}
-                aria-pressed={delivery === 'home'}
-                onClick={() => onDeliveryChange('home')}
-              >
-                <MapPin aria-hidden="true" />
-                <span><strong>Domicilio</strong><small>Dirección guardada</small></span>
-              </Button>
+              {addresses.map(address => <Button variant="outline" key={address.id} type="button" data-selected={delivery === address.id} aria-pressed={delivery === address.id} onClick={() => onDeliveryChange(address.id)}><MapPin aria-hidden="true" /><span><strong>{address.name}</strong><small>{address.address}</small></span></Button>)}
+            </div>
+            <div className={styles.newAddress}>
+              <strong>Otro domicilio</strong>
+              <Input value={newAddressName} onChange={event => setNewAddressName(event.target.value)} placeholder="Nombre, ej. Trabajo" aria-label="Nombre del nuevo domicilio" />
+              <Input value={newAddress} onChange={event => setNewAddress(event.target.value)} placeholder="Dirección completa" aria-label="Dirección del nuevo domicilio" />
+              <div><Button type="button" variant="outline" size="sm" onClick={() => useNewAddress(false)}>Usar sólo hoy</Button><Button type="button" size="sm" onClick={() => useNewAddress(true)}>Guardar domicilio</Button></div>
             </div>
           </fieldset>
 
@@ -217,11 +227,12 @@ export function DishDetailView({
 }
 
 /** Tarjeta reutilizada por pedidos próximos e históricos. */
-function OrderCard({ order }: { order: EmployeeOrder }) {
+function OrderCard({ order, onCancel }: { order: EmployeeOrder; onCancel?: (id: string) => void }) {
   const labels = {
     confirmed: 'Confirmado',
     pending: 'Pendiente',
     delivered: 'Entregado',
+    cancelled: 'Cancelado',
   } as const
 
   return (
@@ -236,6 +247,7 @@ function OrderCard({ order }: { order: EmployeeOrder }) {
         <span><Clock3 aria-hidden="true" />{order.deliveryLabel}</span>
         <strong>${order.amount}</strong>
       </div>
+      {order.status === 'pending' && onCancel && <Button variant="outline" size="sm" onClick={() => onCancel(order.id)}>Cancelar plato</Button>}
     </Card>
   )
 }
@@ -243,7 +255,8 @@ function OrderCard({ order }: { order: EmployeeOrder }) {
 /** Alterna entre dos colecciones mock sin pedir información al backend. */
 export function OrdersView({ onMenu, additionalOrders = [] }: { onMenu: () => void; additionalOrders?: EmployeeOrder[] }) {
   const [tab, setTab] = useState<'upcoming' | 'history'>('upcoming')
-  const orders = tab === 'upcoming' ? [...additionalOrders, ...upcomingOrders] : orderHistory
+  const [cancelled, setCancelled] = useState<string[]>([])
+  const orders = (tab === 'upcoming' ? [...additionalOrders, ...upcomingOrders] : orderHistory).map(order => cancelled.includes(order.id) ? { ...order, status: 'cancelled' as const } : order)
 
   return (
     <section className={styles.view}>
@@ -263,7 +276,7 @@ export function OrdersView({ onMenu, additionalOrders = [] }: { onMenu: () => vo
       </div>
 
       <div className={styles.ordersGrid}>
-        {orders.map((order) => <OrderCard key={order.id} order={order} />)}
+        {orders.map((order) => <OrderCard key={order.id} order={order} onCancel={id => setCancelled(current => [...current, id])} />)}
       </div>
 
       {tab === 'upcoming' && (
@@ -279,8 +292,10 @@ export function OrdersView({ onMenu, additionalOrders = [] }: { onMenu: () => vo
 export { MonthlyPayments as PaymentsView } from '@/features/payments/monthly-payments'
 
 /** Preferencias del empleado; sólo cerrar sesión realiza una petición real a Rails. */
-export function AccountView({ email }: { email: string }) {
+export function AccountView({ email, addresses, onAddAddress }: { email: string; addresses: DeliveryAddress[]; onAddAddress: (name: string, address: string, saved?: boolean) => string }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+  const [addressName, setAddressName] = useState('')
+  const [address, setAddress] = useState('')
 
   // La sesión sí pertenece al backend existente, por eso utiliza el endpoint real.
   const logout = () => router.delete('/logout')
@@ -315,6 +330,15 @@ export function AccountView({ email }: { email: string }) {
               >
                 <span />
               </button>
+            </div>
+          </section>
+          <section className={styles.surface}>
+            <h3>Domicilios guardados</h3>
+            {addresses.map(item => <div className={styles.savedAddress} key={item.id}><MapPin aria-hidden="true" /><span><strong>{item.name}</strong><small>{item.address}</small></span></div>)}
+            <div className={styles.addressForm}>
+              <Label htmlFor="address-name">Nombre<Input id="address-name" value={addressName} onChange={event => setAddressName(event.target.value)} placeholder="Ej. Casa" /></Label>
+              <Label htmlFor="address-value">Dirección<Input id="address-value" value={address} onChange={event => setAddress(event.target.value)} placeholder="Calle, número y apartamento" /></Label>
+              <Button disabled={!addressName.trim() || !address.trim()} onClick={() => { onAddAddress(addressName.trim(), address.trim()); setAddressName(''); setAddress('') }}>Guardar domicilio</Button>
             </div>
           </section>
         </div>

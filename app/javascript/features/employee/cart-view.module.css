@@ -11,6 +11,9 @@
 .quantity { display: flex; grid-column: 1 / -1; align-items: center; gap: 8px; }
 .quantity input { width: 65px; height: 40px; text-align: center; }
 .page select { margin-top: 10px; min-height: 42px; }
+.deliverySelector { display: grid; margin-top: 8px; gap: 8px; }
+.newAddressFields { display: grid; padding: 12px; border: 1px solid #c9c9c4; border-radius: 10px; background: #fafaf8; gap: 8px; }
+.newAddressFields > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .submit { width: 100%; margin-top: 16px; min-height: 44px; }
 .summary { align-self: start; }
 .empty { text-align: center; padding-block: 36px; }

@@ -18,7 +18,10 @@ export type EmployeeView =
 export type PrimaryEmployeeSection = 'menu' | 'orders' | 'payments' | 'account'
 
 /** Destinos de entrega simulados durante la personalización del pedido. */
-export type DeliveryLocation = 'office' | 'home'
+export type DeliveryLocation = 'office' | string
+
+/** Dirección creada por el empleado; las temporales no aparecen en Cuenta. */
+export type DeliveryAddress = { id: string; name: string; address: string; saved: boolean }
 
 /** Resumen suficiente para mostrar un pedido en próximos o historial. */
 export type EmployeeOrder = {
@@ -28,7 +31,7 @@ export type EmployeeOrder = {
   deliveryLabel: string
   amount: number
   quantity: number
-  status: 'confirmed' | 'pending' | 'delivered'
+  status: 'confirmed' | 'pending' | 'delivered' | 'cancelled'
 }
 
 /** Estado de cuenta agrupado por proveedor y período. */
