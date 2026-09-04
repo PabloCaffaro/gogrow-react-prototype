@@ -22,7 +22,6 @@ import {
   ShieldCheck,
   Users,
   UserRound,
-  WalletCards,
 } from 'lucide-react'
 
 import type { AdminEmployee, AdminSection, TemporaryBenefit } from '@/domain/admin'
@@ -30,7 +29,7 @@ import { adminActivity, adminEmployees, adminProfile } from '@/mocks/admin'
 import { Button } from '@/components/ui/actions/button'
 import { Badge } from '@/components/ui/data-display/badge'
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/data-display/card'
-import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/ui/feedback/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/feedback/alert'
 import { Input } from '@/components/ui/forms/input'
 import { Label } from '@/components/ui/forms/label'
 import { Select } from '@/components/ui/forms/select'
@@ -209,7 +208,6 @@ export function AdminDashboard({ email }: Props) {
   const home = (
     <>
       <Header eyebrow="Lunes, 26 de mayo" title={`Hola, ${adminProfile.name} 👋`}><Button variant="outline" size="icon" onClick={() => navigate('account')} aria-label="Configuración"><Settings2 /></Button></Header>
-      <Alert className={styles.alert}><WalletCards /><div><AlertTitle>Hay una liquidación pendiente de revisión</AlertTitle><AlertDescription>Endulzate by Noe · Mayo 2026</AlertDescription></div><AlertAction><Button variant="outline" size="sm" onClick={() => navigate('payments')}>Revisar <ChevronRight /></Button></AlertAction></Alert>
       <section className={styles.stats} aria-label="Resumen de la organización"><Stat label="Empleados con beneficio" value="128" note="20 viandas mensuales" /><Stat label="Pedidos de hoy" value="34" note="72% del consumo diario" /><Stat label="Aporte en mayo" value="$148.200" note="Incluye 3 proveedores" /><Stat label="Uso mensual" value="81%" note="+6% frente a abril" /></section>
       <div className={styles.columns}>
         <section className={styles.surface}><div className={styles.sectionTitle}><div><p>Últimos movimientos</p><h2>Actividad reciente</h2></div><button type="button" onClick={() => navigate('employees')}>Ver empleados</button></div>{adminActivity.map((activity) => <div className={styles.activity} key={activity.title}><span><Check /></span><div><strong>{activity.title}</strong><small>{activity.detail}</small></div><time>{activity.time}</time></div>)}</section>
