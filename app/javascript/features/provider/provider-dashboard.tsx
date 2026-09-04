@@ -3,7 +3,7 @@
  * Todas las operaciones de menús, pedidos y cobros son simulaciones en memoria;
  * únicamente cerrar sesión realiza una petición real a Rails mediante Inertia.
  */
-import { ReceiptList } from '@/features/payments/monthly-payments'
+import { reviewReceipt, usePaymentStore } from '@/features/payments/payment-store'
 import { router } from '@inertiajs/react'
 import { useMemo, useState } from 'react'
 import { usePrototypeNavigation } from '@/lib/use-prototype-navigation'
@@ -52,6 +52,7 @@ export function ProviderDashboard({ email }: Props) {
   const [dishes, setDishes] = useState(initialDishes)
   const [orders, setOrders] = useState(initialOrders)
   const [payments, setPayments] = useState(initialPayments)
+  const { debts, receipts } = usePaymentStore()
   const [companySettlements, setCompanySettlements] = useState(initialCompanySettlements)
 
   // Estado de controles visuales: filtros, selección, paneles y preferencias.
@@ -70,9 +71,18 @@ export function ProviderDashboard({ email }: Props) {
   const currentDay = providerDays.find(item => item.id === day) ?? providerDays[0]
   const dayDishes = useMemo(() => dishes.filter(dish => dish.dayId === day), [day, dishes])
   const visibleOrders = useMemo(() => orders.filter(order => orderFilter === 'all' || order.status === orderFilter), [orders, orderFilter])
-  const visiblePayments = useMemo(() => payments.filter(payment => (paymentFilter === 'all' || payment.status === paymentFilter) && (paymentMonth === 'all' || payment.period === paymentMonth)), [payments, paymentFilter, paymentMonth])
+  // La cuenta del empleado y sus comprobantes alimentan una única lista, sin duplicar deudas.
+  const providerDebts = debts.filter(debt => debt.provider === providerProfile.name)
+  const providerReceipts = receipts.filter(receipt => receipt.provider === providerProfile.name && receipt.status !== 'observed')
+  const coveredDebtIds = new Set(providerReceipts.flatMap(receipt => receipt.allocations.map(item => item.debtId)))
+  const employeePayments = [
+    ...payments.filter(payment => !(payment.employee === 'Sofía' && providerDebts.some(debt => debt.month === payment.period))).map(payment => ({ ...payment, periods: [payment.period], receiptId: '', allocations: [] as { debtId: string; month: string; amount: number }[] })),
+    ...providerDebts.filter(debt => !coveredDebtIds.has(debt.id)).map(debt => ({ id: debt.id, employee: 'Sofía', period: debt.month, periods: [debt.month], amount: debt.amount, date: '', status: (debt.status === 'paid' ? 'confirmed' : debt.status) as PaymentStatus, receipt: '', receiptId: '', allocations: [] as { debtId: string; month: string; amount: number }[] })),
+    ...providerReceipts.map(receipt => ({ id: receipt.id, employee: receipt.employee, period: receipt.allocations.map(item => item.month).join(' · '), periods: receipt.allocations.map(item => item.month), amount: receipt.allocations.reduce((sum, item) => sum + item.amount, 0), date: '', status: (receipt.status === 'paid' ? 'confirmed' : 'pending') as PaymentStatus, receipt: receipt.filename, receiptId: receipt.id, allocations: receipt.allocations })),
+  ]
+  const visiblePayments = employeePayments.filter(payment => (paymentFilter === 'all' || payment.status === paymentFilter) && (paymentMonth === 'all' || payment.periods.includes(paymentMonth)))
   const visibleCompanySettlements = useMemo(() => companySettlements.filter(settlement => (companyFilter === 'all' || settlement.status === companyFilter) && (paymentMonth === 'all' || settlement.period === paymentMonth)), [companyFilter, companySettlements, paymentMonth])
-  const paymentPeriods = useMemo(() => [...new Set([...payments.map(payment => payment.period), ...companySettlements.map(settlement => settlement.period)])], [companySettlements, payments])
+  const paymentPeriods = [...new Set([...employeePayments.flatMap(payment => payment.periods), ...companySettlements.map(settlement => settlement.period)])]
   /** Cambia de sección, cierra el detalle actual y vuelve al inicio del documento. */
   const navigate = (next: ProviderSection) => navigation.navigate({ section: next })
 
@@ -125,8 +135,18 @@ export function ProviderDashboard({ email }: Props) {
     <section className={styles.monthFilter}><CalendarDays /><div><span>Período a consultar</span><strong>{paymentMonth === 'all' ? 'Todos los meses' : paymentMonth}</strong></div><Select value={paymentMonth} onChange={event => setPaymentMonth(event.target.value)} aria-label="Filtrar cobros por mes"><option value="all">Todos los meses</option>{paymentPeriods.map(month => <option key={month}>{month}</option>)}</Select></section>
     {paymentAudience === 'employees' ? <section aria-label="Cobros a empleados">
       <Filters values={['all', 'due', 'pending', 'confirmed']} selected={paymentFilter} labels={{ all: 'Todos', due: 'Pendientes de pago', pending: 'Por confirmar', confirmed: 'Confirmados' }} onChange={value => setPaymentFilter(value as typeof paymentFilter)} />
-      <div className={styles.paymentList}>{visiblePayments.length ? visiblePayments.map(payment => <Card className={styles.payment} size="sm" key={payment.id}><span className={styles.receipt}><ReceiptText /></span><div><small>{payment.period} · {payment.date}</small><h2>{payment.employee}</h2>{payment.status !== 'due' && <Button variant="ghost" size="sm" onClick={() => announce(`Vista previa de ${payment.receipt}`)}><Eye /> Ver comprobante</Button>}</div><strong>${payment.amount}</strong><Badge variant="outline" data-status={payment.status}>{payment.status === 'due' ? 'Pendiente de pago' : payment.status === 'pending' ? 'Por confirmar' : 'Confirmado'}</Badge>{payment.status === 'pending' && <Button onClick={() => { setPayments(current => current.map(item => item.id === payment.id ? { ...item, status: 'confirmed' } : item)); announce('Pago confirmado') }}><Check /> Confirmar pago</Button>}</Card>) : <EmptyPayments message="No hay cobros de empleados con estos filtros." />}</div>
-      <ReceiptList provider={providerProfile.name} canReview period={paymentMonth} />
+      <div className={styles.paymentList}>{visiblePayments.length ? visiblePayments.map(payment => <Card className={styles.payment} size="sm" key={payment.id}>
+        <span className={styles.receipt}><ReceiptText /></span>
+        <div><small>{payment.period}{payment.date && ` · ${payment.date}`}</small><h2>{payment.employee}</h2>
+          {payment.receiptId ? <details className={styles.receiptDetails}><summary>Ver comprobante</summary><p>{payment.receipt}</p>{payment.allocations.map(item => <p key={item.debtId}>{item.month}: ${item.amount}</p>)}</details> : payment.receipt && payment.status !== 'due' ? <Button variant="ghost" size="sm" onClick={() => announce(`Vista previa de ${payment.receipt}`)}><Eye /> Ver comprobante</Button> : null}
+        </div>
+        <strong>${payment.amount}</strong>
+        <Badge variant="outline" data-status={payment.status}>{payment.status === 'due' ? 'Pendiente de pago' : payment.status === 'pending' ? 'Por confirmar' : 'Confirmado'}</Badge>
+        {payment.status === 'pending' && <footer className={styles.paymentReviewActions}>
+          {payment.receiptId && <Button variant="outline" size="sm" onClick={() => { reviewReceipt(payment.receiptId, 'observed'); announce('Comprobante observado') }}>Observar</Button>}
+          <Button size="sm" onClick={() => { if (payment.receiptId) reviewReceipt(payment.receiptId, 'paid'); else setPayments(current => current.map(item => item.id === payment.id ? { ...item, status: 'confirmed' } : item)); announce('Pago confirmado') }}><Check /> Confirmar pago</Button>
+        </footer>}
+      </Card>) : <EmptyPayments message="No hay cobros de empleados con estos filtros." />}</div>
     </section> : <section aria-label="Cobro a GoGrow">
       <Filters values={['all', 'pending', 'review', 'confirmed']} selected={companyFilter} labels={{ all: 'Todas', pending: 'A liquidar', review: 'En revisión', confirmed: 'Confirmadas' }} onChange={value => setCompanyFilter(value as typeof companyFilter)} />
       <div className={styles.paymentList}>{visibleCompanySettlements.length ? visibleCompanySettlements.map(settlement => <Card className={styles.payment} size="sm" key={settlement.id}><span className={styles.receipt}><CircleDollarSign /></span><div><small>{settlement.period} · vence {settlement.dueDate}</small><h2>Aporte GoGrow</h2><p>{settlement.meals} viandas con aporte corporativo</p></div><strong>${settlement.amount}</strong><Badge variant="outline" data-status={settlement.status}>{settlement.status === 'pending' ? 'A liquidar' : settlement.status === 'review' ? 'En revisión' : 'Confirmada'}</Badge>{settlement.status === 'review' && <Button onClick={() => { setCompanySettlements(current => current.map(item => item.id === settlement.id ? { ...item, status: 'confirmed' } : item)); announce('Liquidación de GoGrow confirmada') }}><Check /> Confirmar cobro</Button>}</Card>) : <EmptyPayments message="No hay liquidaciones de GoGrow con estos filtros." />}</div>

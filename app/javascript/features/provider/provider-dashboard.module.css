@@ -20,6 +20,15 @@
 .monthFilter select { grid-column: 1 / -1; width: 100%; min-height: 40px; }
 @media(min-width:700px){.monthFilter{grid-template-columns:34px 1fr 190px}.monthFilter select{grid-column:auto}}
 .paymentTabs { display: grid; grid-template-columns: 1fr 1fr; margin: 0 0 13px; gap: 7px; }
+/* Los comprobantes compartidos usan la misma tarjeta que los cobros individuales. */
+.payment > div { min-width: 0; overflow-wrap: anywhere; }
+.paymentReviewActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; grid-column: 1 / -1; }
+.paymentReviewActions button { min-height: 44px; }
+.receiptDetails { margin-top: 7px; font-size: .7rem; }
+.receiptDetails summary { cursor: pointer; padding-block: 8px; }
+.receiptDetails summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.receiptDetails p { overflow-wrap: anywhere; }
+@media(min-width:900px){.paymentReviewActions{grid-column:5;grid-row:1;flex-direction:column;align-items:stretch}}
 .paymentTabs button { min-height: 43px; padding-inline: 9px; font-size: .68rem; }
 .groupedReceipts { display: grid; margin-top: 20px; padding-top: 19px; border-top: 2px solid #deded9; gap: 12px; }
 .groupedReceipts > div { display: grid; gap: 3px; }
