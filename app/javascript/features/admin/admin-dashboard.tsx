@@ -8,14 +8,12 @@ import { usePrototypeNavigation } from '@/lib/use-prototype-navigation'
 import {
   ArrowLeft,
   BarChart3,
-  Bell,
   Check,
   ChevronRight,
   CircleDollarSign,
   Clock3,
   Home,
   LogOut,
-  Plus,
   ReceiptText,
   Search,
   Settings2,
@@ -108,7 +106,6 @@ export function AdminDashboard({ email }: Props) {
   const setDetailTab = (tab: EmployeeDetailTab) => navigationState.navigate({ section: 'employees', detail: selectedEmployeeId, tab })
 
   // Preferencias y mensajes puramente locales del prototipo.
-  const [notifications, setNotifications] = useState(true)
   const [toast, setToast] = useState<string | null>(null)
 
   // Borrador de los dos formularios de beneficio del empleado seleccionado.
@@ -219,7 +216,7 @@ export function AdminDashboard({ email }: Props) {
   // Vista de listado: buscador, filtros y acceso al detalle de cada empleado.
   const employeeList = (
     <>
-      <Header eyebrow="Gestión de personas" title="Empleados" description="Cada persona tiene 20 viandas mensuales y puede contar con una configuración individual."><Button size="lg" onClick={() => announce('Formulario de alta listo para la próxima etapa')}><Plus /> Agregar</Button></Header>
+      <Header eyebrow="Gestión de personas" title="Empleados" />
       <div className={styles.search}><Search aria-hidden="true" /><Input type="search" value={employeeSearch} onFocus={focusEmployeeSearch} onChange={(event) => setEmployeeSearch(event.target.value)} placeholder="Buscar por nombre o correo" aria-label="Buscar empleados" /></div>
       <div className={styles.filters} aria-label="Filtrar empleados">{employeeFilters.map(([value, label]) => <Button type="button" size="sm" variant={employeeFilter === value ? 'default' : 'outline'} key={value} data-selected={employeeFilter === value} onClick={() => setEmployeeFilter(value)}>{label}</Button>)}</div>
       <section className={styles.employeeList} aria-label="Listado de empleados">{visibleEmployees.map((employee) => {
@@ -240,14 +237,13 @@ export function AdminDashboard({ email }: Props) {
       <Header eyebrow={selectedEmployee.team} title={selectedEmployee.name} description={selectedEmployee.email} />
       {selectedEmployee.temporaryBenefit && <Alert className={styles.temporaryBanner}><Clock3 /><div><AlertTitle>Beneficio temporal activo</AlertTitle><AlertDescription>{selectedEmployee.temporaryBenefit.companyContribution}% de aporte hasta el {selectedEmployee.temporaryBenefit.endsOn}</AlertDescription></div></Alert>}
       <div className={styles.detailTabs} role="tablist" aria-label="Detalle del empleado">{detailTabs.map(([value, label]) => <Button type="button" size="sm" variant={detailTab === value ? 'secondary' : 'ghost'} role="tab" aria-selected={detailTab === value} data-selected={detailTab === value} key={value} onClick={() => setDetailTab(value)}>{label}</Button>)}</div>
-      {detailTab === 'summary' && <><section className={styles.stats}><Stat label="Consumidas este mes" value={`${selectedEmployee.ordersThisMonth} / ${benefit.monthlyAllowance}`} note="El beneficio se reinicia mensualmente" /><Stat label="Disponibles" value={String(remaining)} note="No es un límite semanal" /><Stat label="Aporte de empresa" value={`${benefit.companyContribution}%`} note={selectedEmployee.temporaryBenefit ? 'Configuración temporal activa' : 'Configuración permanente'} /><Stat label="Deuda total" value={`$${debt}`} note={`${selectedEmployee.balances.filter((balance) => balance.debt > 0).length} proveedores con saldo`} /></section><div className={styles.columns}><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Beneficio vigente</p><h2>Cómo se calcula</h2></div><button type="button" onClick={() => setDetailTab('benefit')}>Modificar</button></div><div className={styles.infoRow}><span>Asignación mensual</span><strong>{benefit.monthlyAllowance} viandas</strong></div><div className={styles.infoRow}><span>Aporte de la empresa</span><strong>{benefit.companyContribution}%</strong></div><div className={styles.infoRow}><span>Origen</span><strong>{selectedEmployee.temporaryBenefit ? 'Excepción temporal' : selectedEmployee.companyContribution === 50 && selectedEmployee.monthlyAllowance === 20 ? 'Estándar de la empresa' : 'Personalizado'}</strong></div></section><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Actividad</p><h2>Consumo reciente</h2></div><button type="button" onClick={() => setDetailTab('orders')}>Ver pedidos</button></div><div className={styles.infoRow}><span>Esta semana</span><strong>{Math.min(selectedEmployee.orders.length, 3)} pedidos</strong></div><div className={styles.infoRow}><span>Este mes</span><strong>{selectedEmployee.ordersThisMonth} pedidos</strong></div><div className={styles.infoRow}><span>Último proveedor</span><strong>{selectedEmployee.orders[0]?.provider ?? 'Sin pedidos'}</strong></div></section></div></>}
+      {detailTab === 'summary' && <><section className={styles.stats}><Stat label="Consumidas este mes" value={`${selectedEmployee.ordersThisMonth} / ${benefit.monthlyAllowance}`} note="Consumo mensual" /><Stat label="Disponibles" value={String(remaining)} note="Viandas disponibles este mes" /><Stat label="Aporte de empresa" value={`${benefit.companyContribution}%`} note={selectedEmployee.temporaryBenefit ? 'Configuración temporal activa' : 'Configuración permanente'} /><Stat label="Deuda total" value={`$${debt}`} note={`${selectedEmployee.balances.filter((balance) => balance.debt > 0).length} proveedores con saldo`} /></section><div className={styles.columns}><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Beneficio vigente</p><h2>Beneficio asignado</h2></div><button type="button" onClick={() => setDetailTab('benefit')}>Modificar</button></div><div className={styles.infoRow}><span>Asignación mensual</span><strong>{benefit.monthlyAllowance} viandas</strong></div><div className={styles.infoRow}><span>Aporte de la empresa</span><strong>{benefit.companyContribution}%</strong></div><div className={styles.infoRow}><span>Origen</span><strong>{selectedEmployee.temporaryBenefit ? 'Excepción temporal' : selectedEmployee.companyContribution === 50 && selectedEmployee.monthlyAllowance === 20 ? 'Estándar de la empresa' : 'Personalizado'}</strong></div></section><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Actividad</p><h2>Consumo reciente</h2></div><button type="button" onClick={() => setDetailTab('orders')}>Ver pedidos</button></div><div className={styles.infoRow}><span>Esta semana</span><strong>{Math.min(selectedEmployee.orders.length, 3)} pedidos</strong></div><div className={styles.infoRow}><span>Este mes</span><strong>{selectedEmployee.ordersThisMonth} pedidos</strong></div><div className={styles.infoRow}><span>Último proveedor</span><strong>{selectedEmployee.orders[0]?.provider ?? 'Sin pedidos'}</strong></div></section></div></>}
       {detailTab === 'orders' && <section className={styles.orderList}>{selectedEmployee.orders.length > 0 ? selectedEmployee.orders.map((order) => <article className={styles.order} key={order.id}><span className={styles.orderIcon}><ReceiptText /></span><div><small>{order.id} · {order.date}</small><h2>{order.dish}</h2><p>{order.provider}</p></div><strong>${order.amount}</strong><footer><span>Empresa: ${order.companyShare}</span><span>Empleado: ${order.employeeShare}</span></footer></article>) : <div className={styles.empty}><ReceiptText /><p>Este empleado todavía no realizó pedidos en el período.</p></div>}</section>}
       {detailTab === 'balances' && <section className={styles.balanceGrid}>{selectedEmployee.balances.map((balance) => <article className={styles.balance} key={balance.provider}><span><CircleDollarSign /></span><div><small>Proveedor</small><h2>{balance.provider}</h2></div><div><small>Generado</small><strong>${balance.generated}</strong></div><div><small>Pagado</small><strong>${balance.paid}</strong></div><div><small>Deuda pendiente</small><strong data-debt={balance.debt > 0}>${balance.debt}</strong></div></article>)}</section>}
       {detailTab === 'benefit' && <div className={styles.benefitForms}>
         <Card className={styles.formCard}>
           <CardHeader><CardDescription>Configuración permanente</CardDescription><h2>Beneficio general</h2></CardHeader>
           <CardContent>
-            <p className={styles.formHelp}>Se aplica cuando no existe una excepción temporal vigente.</p>
             <div className={styles.formGrid}>
               <Label htmlFor="base-allowance">Viandas por mes<Select id="base-allowance" value={baseAllowance} onChange={(event) => setBaseAllowance(event.target.value)}><option value="15">15 viandas</option><option value="20">20 viandas</option><option value="25">25 viandas</option></Select></Label>
               <Label htmlFor="base-contribution">Aporte de la empresa<Select id="base-contribution" value={baseContribution} onChange={(event) => setBaseContribution(event.target.value)}><option value="25">25%</option><option value="50">50%</option><option value="60">60%</option><option value="75">75%</option><option value="100">100%</option></Select></Label>
@@ -258,7 +254,6 @@ export function AdminDashboard({ email }: Props) {
         <Card className={styles.formCard}>
           <CardHeader><CardDescription>Excepción con vencimiento</CardDescription><h2>Beneficio temporal</h2></CardHeader>
           <CardContent>
-            <p className={styles.formHelp}>Mientras esté vigente, reemplaza la configuración permanente y luego vuelve automáticamente a ella.</p>
             <div className={styles.formGrid}>
               <Label htmlFor="temporary-allowance">Viandas por mes<Select id="temporary-allowance" value={temporaryAllowance} onChange={(event) => setTemporaryAllowance(event.target.value)}><option value="20">20 viandas</option><option value="25">25 viandas</option><option value="30">30 viandas</option></Select></Label>
               <Label htmlFor="temporary-contribution">Aporte temporal<Select id="temporary-contribution" value={temporaryContribution} onChange={(event) => setTemporaryContribution(event.target.value)}><option value="50">50%</option><option value="60">60%</option><option value="75">75%</option><option value="100">100%</option></Select></Label>
@@ -278,11 +273,11 @@ export function AdminDashboard({ email }: Props) {
 
   // Las siguientes constantes son vistas presentacionales de cada sección principal.
   // Administración controla los meses adeudados, sin repetir el listado de comprobantes.
-  const payments = <MonthlyPayments mode="admin" showReceipts={false} />
+  const payments = <MonthlyPayments mode="admin" />
 
-  const insights = <><Header eyebrow="Últimos 30 días" title="Métricas" description="Una lectura del uso del beneficio mensual en la organización." /><section className={styles.stats}><Stat label="Pedidos" value="1.248" note="+9% frente a abril" /><Stat label="Usuarios frecuentes" value="92" note="72% de los empleados" /><Stat label="Ticket promedio" value="$318" note="Empresa aporta $159" /><Stat label="Uso del beneficio" value="81%" note="Promedio mensual" /></section><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Tendencia mensual</p><h2>Pedidos por semana</h2></div></div><p className={styles.chartHelp}>La división semanal permite observar el ritmo de consumo, pero el beneficio se contabiliza sobre el total mensual.</p><div className={styles.chart}>{[58, 72, 66, 88].map((height, index) => <div key={height}><span style={{ height: `${height}%` }} /><small>Semana {index + 1}</small></div>)}</div></section></>
+  const insights = <><Header eyebrow="Últimos 30 días" title="Métricas" /><section className={styles.stats}><Stat label="Pedidos" value="1.248" note="+9% frente a abril" /><Stat label="Usuarios frecuentes" value="92" note="72% de los empleados" /><Stat label="Ticket promedio" value="$318" note="Empresa aporta $159" /><Stat label="Uso del beneficio" value="81%" note="Promedio mensual" /></section><section className={styles.surface}><div className={styles.sectionTitle}><div><p>Tendencia mensual</p><h2>Pedidos por semana</h2></div></div><div className={styles.chart}>{[58, 72, 66, 88].map((height, index) => <div key={height}><span style={{ height: `${height}%` }} /><small>Semana {index + 1}</small></div>)}</div></section></>
 
-  const account = <><Header eyebrow="Preferencias" title="Mi cuenta" description="Administrá tus datos y las notificaciones del panel." /><div className={styles.accountGrid}><section className={styles.profile}><span className={styles.bigAvatar}>{adminProfile.initials}</span><div><h2>{adminProfile.fullName}</h2><p>Administradora · {adminProfile.company}</p><small>{email}</small></div></section><section className={styles.surface}><div className={styles.setting}><Bell /><span><strong>Resumen semanal</strong><small>Actividad, consumos y liquidaciones.</small></span><button type="button" className={styles.switch} role="switch" aria-checked={notifications} data-enabled={notifications} onClick={() => setNotifications((value) => !value)}><i /></button></div><button type="button" className={styles.accountLink} onClick={() => router.delete('/logout')}><LogOut /> Cerrar sesión <ChevronRight /></button></section></div></>
+  const account = <><Header eyebrow="Preferencias" title="Mi cuenta" /><div className={styles.accountGrid}><section className={styles.profile}><span className={styles.bigAvatar}>{adminProfile.initials}</span><div><h2>{adminProfile.fullName}</h2><p>Administradora · {adminProfile.company}</p><small>{email}</small></div></section><section className={styles.surface}><button type="button" className={styles.accountLink} onClick={() => router.delete('/logout')}><LogOut /> Cerrar sesión <ChevronRight /></button></section></div></>
 
   // Mapa de navegación: evita condicionales repetidos al elegir la vista principal.
   const views: Record<AdminSection, React.ReactNode> = { home, employees: employeesView, payments, insights, account }

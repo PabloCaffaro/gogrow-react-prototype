@@ -1,10 +1,9 @@
 /** Vistas visuales del carrito: el dashboard conserva los datos entre pantallas. */
 import { useState } from 'react'
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { ArrowLeft, Check, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/actions/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/data-display/card'
 import { Badge } from '@/components/ui/data-display/badge'
-import { Alert, AlertDescription } from '@/components/ui/feedback/alert'
 import { Input } from '@/components/ui/forms/input'
 import { Label } from '@/components/ui/forms/label'
 import { Select } from '@/components/ui/forms/select'
@@ -33,7 +32,14 @@ export function CartView({ lines, deliveries, onQuantity, onRemove, onDelivery, 
   const count = cartCount(lines)
   return <section className={styles.page}>
     <Button variant="ghost" onClick={onBack}><ArrowLeft />{confirmed ? 'Volver al menú' : 'Seguir eligiendo'}</Button>
-    <header><h1>{confirmed ? '¡Pedido confirmado!' : 'Tu carrito'}</h1><p>{count} {count === 1 ? 'plato' : 'platos'} · {money(cartTotal(lines))}</p></header>
+    {/* Confirmar el carrito envía el pedido; el proveedor todavía debe aceptarlo. */}
+    {confirmed ? <Card className={styles.success}><CardContent className={styles.successContent}>
+      <div className={styles.successIcon} aria-hidden="true"><Check /></div>
+      <header role="status"><span className={styles.successEyebrow}>Pedido enviado</span><h1>¡Listo! Recibimos tu pedido</h1><p>Ya podés consultar el detalle en Mis pedidos. Cada proveedor confirmará los platos que le corresponden.</p></header>
+      <Badge variant="secondary">Pendiente de confirmación del proveedor</Badge>
+      <dl className={styles.successTotals}><div><dt>Platos</dt><dd>{count}</dd></div><div><dt>Total</dt><dd>{money(cartTotal(lines))}</dd></div><div><dt>Entregas</dt><dd>{groups.length}</dd></div></dl>
+      <Button className={styles.successAction} onClick={onOrders}>Ver mis pedidos</Button>
+    </CardContent></Card> : <header><h1>Tu carrito</h1><p>{count} {count === 1 ? 'plato' : 'platos'} · {money(cartTotal(lines))}</p></header>}
     {!lines.length ? <Card><CardContent className={styles.empty}><ShoppingBag /><h2>Tu carrito está vacío</h2><p>Agregá platos desde el menú para comenzar.</p><Button onClick={onBack}>Ver menú</Button></CardContent></Card> : <>
       <div className={styles.layout}><div className={styles.groups}>
         {groups.map(key => {
@@ -62,10 +68,9 @@ export function CartView({ lines, deliveries, onQuantity, onRemove, onDelivery, 
           </Card>
         })}
       </div><Card className={styles.summary}><CardContent>
-        <h2>{confirmed ? 'Resumen confirmado' : 'Resumen del pedido'}</h2>
+        <h2>{confirmed ? 'Resumen del pedido enviado' : 'Resumen del pedido'}</h2>
         <p>{count} {count === 1 ? 'plato' : 'platos'} · {money(cartTotal(lines))}</p>
         <p>{groups.length} {groups.length === 1 ? 'entrega' : 'entregas'}</p>
-        <Alert><AlertDescription>Importes de demostración con el beneficio del catálogo. El cobro al superar el cupo mensual todavía no está definido.</AlertDescription></Alert>
         <Button className={styles.submit} onClick={confirmed ? onOrders : onConfirm}>{confirmed ? 'Ver mis pedidos' : 'Confirmar pedido'}</Button>
       </CardContent></Card></div>
     </>}

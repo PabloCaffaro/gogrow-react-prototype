@@ -1,31 +1,83 @@
-.page { display: grid; gap: 16px; padding-bottom: 20px; }
-.page h1 { margin: 0; font-size: 1.6rem; }
-.page h2, .page h3, .receipts h3 { margin: 0; font-size: 1rem; }
-.page p, .receipts p { color: var(--muted-foreground); font-size: .85rem; line-height: 1.5; }
-.page select { height: 44px; }
-.layout, .receipts { display: grid; gap: 16px; min-width: 0; }
-.providerCard { border-color: #d8d8d3; background: linear-gradient(135deg, #fff, #f7f7f4); }
-.providerCard [data-slot=card-header] { gap: 4px; }
-.providerCard [data-slot=card-header] > p:first-child { margin: 0; font-size: .7rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
-.providerCard [data-slot=card-header] > strong { margin-top: 6px; font-size: 1.12rem; }
-.paymentGroups { border-color: #d8d8d3; }
-.debt { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
-.debt > div { display: grid; gap: 8px; min-width: 0; }
-.debt [data-slot=badge] { white-space: normal; width: fit-content; }
-.statusGroup { margin-top: 18px; padding: 14px; border: 1px solid #e0e0dc; border-radius: 12px; background: #fcfcfa; }
-.statusGroup:first-child { margin-top: 0; }
-.emptyGroup { margin: 8px 0 2px; padding: 10px; border: 1px dashed #d4d4cf; border-radius: 9px; color: #73736e !important; font-size: .78rem !important; }
-.groupTitle { margin: 0 0 6px; color: #454540; font-size: .83rem !important; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
-.statusGroup:has([data-payment-status=due]) { border-left: 4px solid #a5a5a0; }
-.statusGroup:has([data-payment-status=pending]) { border-left: 4px solid #d1a847; }
-.statusGroup:has([data-payment-status=paid]) { border-left: 4px solid #56a169; }
-.debt [data-payment-status=due], .debt [data-payment-status=pending] { border-color: #d5d5d1; background: #eeeeeb; color: #666661; }
+/* Composición mobile-first compartida por Pagos y Liquidaciones. */
+.page { display: grid; gap: 20px; min-width: 0; padding-bottom: 24px; }
+.page h1, .page h2, .page h3, .receipts h3 { margin: 0; }
+.page p, .receipts p { color: var(--muted-foreground); font-size: .82rem; line-height: 1.5; }
+.heading p { margin: 0 0 6px; font-size: .67rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.heading h1 { font-size: 1.75rem; letter-spacing: -.04em; }
+.providerCard { padding: 0; gap: 0; background: var(--card); }
+.providerContent { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 18px; }
+.providerIdentity { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.providerIdentity > div { min-width: 0; }
+.providerIdentity p { margin: 0 0 4px; font-size: .68rem; }
+.providerIdentity h2 { font-size: 1.05rem; overflow-wrap: anywhere; }
+.providerIcon { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: var(--muted); }
+.providerIcon svg { width: 20px; height: 20px; }
+.providerPicker { display: grid; gap: 7px; min-width: 0; }
+.providerPicker label { font-size: .72rem; }
+.providerPicker select { width: 100%; min-width: 0; height: 44px; font-size: .8rem; }
+.accountInfo, .balance { display: grid; gap: 6px; padding-top: 14px; border-top: 1px solid var(--border); min-width: 0; }
+.accountInfo > span, .balance > span { font-size: .72rem; color: var(--muted-foreground); }
+.accountInfo strong { font-size: .83rem; line-height: 1.5; overflow-wrap: anywhere; }
+.balance strong { font-size: 1.45rem; letter-spacing: -.03em; }
+.overview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; min-width: 0; }
+.metric { min-width: 0; padding: 0; }
+.metric [data-slot=card-content] { display: grid; gap: 8px; padding: 12px 9px; }
+.metric span { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; color: var(--muted-foreground); font-size: .65rem; }
+.metric svg { width: 14px; height: 14px; }
+.metric strong { font-size: clamp(.9rem, 3.6vw, 1.35rem); letter-spacing: -.03em; overflow-wrap: anywhere; }
+.metric small { color: var(--muted-foreground); font-size: .65rem; }
+.layout, .paymentGroups, .receipts { display: grid; gap: 24px; min-width: 0; }
+.statusGroup { display: grid; gap: 12px; min-width: 0; }
+.groupHeader { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-top: 16px; border-top: 2px solid var(--border); }
+.groupHeader h2 { display: flex; align-items: center; gap: 7px; font-size: .95rem; }
+.groupHeader h2 > svg { width: 17px; height: 17px; }
+.groupHeader h2 > span { display: grid; place-items: center; min-width: 23px; min-height: 23px; border-radius: 50%; background: var(--muted); font-size: .7rem; }
+.groupHeader button { min-height: 40px; font-size: .72rem; }
+.statusGroup[data-status=pending] .groupHeader { border-color: #e1cc8f; }
+.statusGroup[data-status=paid] .groupHeader { border-color: #b9ddc2; }
+.debtList { display: grid; gap: 10px; }
+.debt { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 14px 12px; min-width: 0; }
+.debt[data-selected=true] { box-shadow: 0 0 0 1px var(--foreground); background: var(--muted); }
+.debtControl { display: grid; place-items: center; min-height: 44px; }
+.debtControl svg { width: 19px; height: 19px; color: var(--muted-foreground); }
+.debtInfo { display: grid; gap: 8px; min-width: 0; }
+.debtInfo label, .debtInfo h3 { font-size: .84rem; font-weight: 700; line-height: 1.4; }
+.debtInfo label { cursor: pointer; padding-block: 6px; }
+.debtInfo small { font-size: .68rem; color: var(--muted-foreground); overflow-wrap: anywhere; }
+.debtAmount { font-size: .87rem; white-space: nowrap; }
+.debt [data-slot=badge] { width: fit-content; max-width: 100%; white-space: normal; font-size: .62rem; }
+.debt [data-payment-status=due] { border-color: #d5d5d1; background: #eeeeeb; color: #666661; }
+.debt [data-payment-status=pending] { border-color: #efd37f; background: #fff2ce; color: #826100; }
 .debt [data-payment-status=paid] { border-color: #b9ddc2; background: #e7f4ea; color: #33774a; }
-.debt small { font-size: .7rem; color: var(--muted-foreground); overflow-wrap: anywhere; }
-.summary { align-self: start; }
-.summary button { width: 100%; margin-top: 12px; height: auto; min-height: 42px; white-space: normal; }
-.summary input { margin-top: 12px; height: auto; }
+.emptyGroup { padding: 20px 16px; border: 1px dashed var(--border); border-radius: 12px; color: var(--muted-foreground); font-size: .78rem; text-align: center; }
+.summary { align-self: start; min-width: 0; gap: 16px; }
+.summary [data-slot=card-header], .summary [data-slot=card-content] { display: grid; min-width: 0; gap: 12px; padding-inline: 18px; }
+.summaryEyebrow { font-size: .68rem; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: .07em; font-weight: 700; }
+.summary h2 { font-size: 1.8rem; letter-spacing: -.04em; }
+.summary p { margin: 0; }
+.summary button { width: 100%; min-height: 44px; height: auto; white-space: normal; }
+.selectedMonths { display: grid; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.selectedMonths > div { display: flex; justify-content: space-between; gap: 12px; font-size: .77rem; }
+.selectedMonths strong { white-space: nowrap; }
+.receiptField { display: grid; gap: 10px; min-width: 0; }
+.receiptField label { font-size: .8rem; }
+.receiptField input { width: 100%; min-width: 0; height: auto; font-size: .72rem; }
+.selectionEmpty { padding-block: 12px; }
 .filename { overflow-wrap: anywhere; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .actions button { min-height: 42px; height: auto; white-space: normal; }
-@media(min-width: 1100px) { .layout { grid-template-columns: minmax(0, 1fr) 320px; } .receipts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media(max-width:360px) {
+  .debt { grid-template-columns: 28px minmax(0, 1fr); }
+  .debtAmount { grid-column: 2; }
+}
+@media(min-width:700px) {
+  .providerContent { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 22px; }
+  .metric [data-slot=card-content] { padding: 18px; }
+  .metric span { font-size: .75rem; }
+}
+@media(min-width:1100px) {
+  .heading h1 { font-size: 2rem; }
+  .layout { grid-template-columns: minmax(0, 1fr) 300px; align-items: start; }
+  .summary { position: sticky; top: 24px; }
+  .receipts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

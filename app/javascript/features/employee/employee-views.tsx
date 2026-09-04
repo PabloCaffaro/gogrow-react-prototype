@@ -110,7 +110,6 @@ export function DishDetailView({
       <ScreenHeader
         eyebrow={dish.providerName}
         title="Detalle del plato"
-        description="Personalizá tu pedido antes de continuar."
         onBack={onBack}
       />
 
@@ -166,7 +165,7 @@ export function DishDetailView({
 
         <aside className={styles.orderPanel}>
           <div className={styles.surface}>
-            <h3>Cantidad</h3><p className={styles.bodyText}>Máximo 20 por plato entre todas sus variantes. Podés agregar {maxQuantity} más.</p>
+            <h3>Cantidad</h3>
             <div className={styles.quantityControl}>
               <Button variant="outline"
                 type="button"
@@ -263,7 +262,6 @@ export function OrdersView({ onMenu, additionalOrders = [] }: { onMenu: () => vo
       <ScreenHeader
         eyebrow="Tus compras"
         title="Mis pedidos"
-        description="Consultá próximas entregas y pedidos anteriores."
       />
 
       <div className={styles.tabList} aria-label="Tipo de pedidos">
@@ -305,7 +303,6 @@ export function AccountView({ email, addresses, onAddAddress }: { email: string;
       <ScreenHeader
         eyebrow="Preferencias"
         title="Mi cuenta"
-        description="Administrá tus datos y el beneficio asignado."
       />
 
       <div className={styles.accountGrid}>

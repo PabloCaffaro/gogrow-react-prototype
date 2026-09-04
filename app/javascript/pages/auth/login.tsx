@@ -194,11 +194,10 @@ export default function Login() {
                 {/* Estos accesos completan credenciales; el rol se valida luego en Rails. */}
                 <div className={styles.demoDivider}>
                   <Separator className={styles.dividerLine} />
-                  <span className={styles.dividerLabel}>Acceso rápido de demostración</span>
+                  <span className={styles.dividerLabel}>Cuentas de prueba</span>
                   <Separator className={styles.dividerLine} />
                 </div>
 
-                <p className={styles.demoHelp}>Elegí un perfil para completar sus credenciales.</p>
                 <div className={styles.demoButtons}>
                   {demoAccounts.map((account) => (
                     <button

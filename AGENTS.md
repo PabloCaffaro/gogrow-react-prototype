@@ -141,6 +141,12 @@ comprobante por confirmar o confirmado. Esa sección está separada entre
 **Cobro a GoGrow** (liquidaciones mock del aporte corporativo); no mezclar
 ambos flujos ni crear persistencia para ellos.
 
+Los pedidos del proveedor se gestionan directamente desde tarjetas con todos
+sus datos: confirmar/cancelar pendientes y marcar confirmados como entregados.
+No dependen de un panel lateral ni de desplazamiento automático en móvil.
+No mostrar cupones ni el formulario de anticipación para recibir pedidos.
+Administración no ofrece alta de empleados ni el interruptor de resumen semanal.
+
 En móvil no deben desaparecer secciones presentes en escritorio. El proveedor
 expone también Métricas en su barra inferior; el empleado mantiene Menú,
 Pedidos, Pagos y Cuenta.
